@@ -5,18 +5,18 @@ import { sdk } from '@farcaster/miniapp-sdk';
 // Upgrade definitions
 // ============================================================
 const UPGRADES = [
-  { id: 'cursor',  name: 'Cursor',        emoji: '👆',  kind: 'click', power: 1,      baseCost: 10,          orbit: 'inner' },
-  { id: 'spoon',   name: 'Wooden Spoon',  emoji: '🥄',  kind: 'click', power: 5,      baseCost: 100,         orbit: 'inner' },
-  { id: 'whisk',   name: 'Magic Whisk',   emoji: '🪄',  kind: 'click', power: 25,     baseCost: 1_500,       orbit: 'inner' },
-  { id: 'mixer',   name: 'Stand Mixer',   emoji: '🧁',  kind: 'click', power: 100,    baseCost: 25_000,      orbit: 'inner' },
-  { id: 'grandma', name: 'Grandma',       emoji: '👵',  kind: 'cps',   power: 1,      baseCost: 50,          orbit: 'mid' },
-  { id: 'farm',    name: 'Cookie Farm',   emoji: '🌾',  kind: 'cps',   power: 5,      baseCost: 500,         orbit: 'mid' },
-  { id: 'mine',    name: 'Cookie Mine',   emoji: '⛏️', kind: 'cps',   power: 25,     baseCost: 5_000,       orbit: 'mid' },
-  { id: 'factory', name: 'Factory',       emoji: '🏭',  kind: 'cps',   power: 100,    baseCost: 50_000,      orbit: 'mid' },
-  { id: 'bank',    name: 'Cookie Bank',   emoji: '🏦',  kind: 'cps',   power: 500,    baseCost: 500_000,     orbit: 'outer' },
-  { id: 'temple',  name: 'Temple',        emoji: '🏛️', kind: 'cps',   power: 2_500,  baseCost: 5_000_000,   orbit: 'outer' },
-  { id: 'wizard',  name: 'Wizard Tower',  emoji: '🧙',  kind: 'cps',   power: 12_500, baseCost: 50_000_000,  orbit: 'outer', fx: 'shoot' },
-  { id: 'rocket',  name: 'Cookie Rocket', emoji: '🚀',  kind: 'cps',   power: 60_000, baseCost: 500_000_000, orbit: 'outer' }
+  { id: 'cursor',  name: 'Click Bot',     emoji: '🤖',  kind: 'click', power: 1,      baseCost: 10,          orbit: 'inner' },
+  { id: 'spoon',   name: 'Auto-Liker',    emoji: '💜',  kind: 'click', power: 5,      baseCost: 100,         orbit: 'inner' },
+  { id: 'whisk',   name: 'Recast Engine', emoji: '🔁',  kind: 'click', power: 25,     baseCost: 1_500,       orbit: 'inner' },
+  { id: 'mixer',   name: 'Based Node',    emoji: '🔵',  kind: 'click', power: 100,    baseCost: 25_000,      orbit: 'inner' },
+  { id: 'grandma', name: 'Click Farm',    emoji: '📱',  kind: 'cps',   power: 1,      baseCost: 50,          orbit: 'mid' },
+  { id: 'farm',    name: 'AI Clicker',    emoji: '🧠',  kind: 'cps',   power: 5,      baseCost: 500,         orbit: 'mid' },
+  { id: 'mine',    name: 'Crypto Miner',  emoji: '⛏️', kind: 'cps',   power: 25,     baseCost: 5_000,       orbit: 'mid' },
+  { id: 'factory', name: 'Meme Factory',  emoji: '🐸',  kind: 'cps',   power: 100,    baseCost: 50_000,      orbit: 'mid' },
+  { id: 'bank',    name: 'DeFi Protocol', emoji: '🏦',  kind: 'cps',   power: 500,    baseCost: 500_000,     orbit: 'outer' },
+  { id: 'temple',  name: 'Farcaster Hub', emoji: '🟣',  kind: 'cps',   power: 2_500,  baseCost: 5_000_000,   orbit: 'outer' },
+  { id: 'wizard',  name: 'LLM Cluster',   emoji: '🖥️', kind: 'cps',   power: 12_500, baseCost: 50_000_000,  orbit: 'outer', fx: 'shoot' },
+  { id: 'rocket',  name: 'AGI',           emoji: '🌌',  kind: 'cps',   power: 60_000, baseCost: 500_000_000, orbit: 'outer' }
 ];
 
 const COST_MULTIPLIER = 1.15;
