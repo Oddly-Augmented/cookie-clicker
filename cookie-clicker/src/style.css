@@ -58,7 +58,8 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 .cookie img {
   width: 250px; height: 250px;
   object-fit: contain;
-  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 30px rgba(121, 89, 255, 0.6));
+  image-rendering: pixelated;
 }
 .cookie:active { transform: scale(0.92); }
 .cookie.pop    { animation: pop 0.15s ease; }
