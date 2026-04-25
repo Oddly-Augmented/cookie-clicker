@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Cookie Clicker</title>
+  </head>
+  <body>
+    <main class="app">
+      <header class="head">
+        <h1>Cookie Clicker</h1>
+        <p class="stat"><span id="count">0</span> cookies</p>
+        <p class="sub">
+          +<span id="perClick">1</span> per click
+          · <span id="perSec">0</span>/sec
+        </p>
+      </header>
+
+      <div class="stage" id="stage">
+        <div class="orbit orbit-inner"  id="orbit-inner"></div>
+        <div class="orbit orbit-mid"    id="orbit-mid"></div>
+        <div class="orbit orbit-outer"  id="orbit-outer"></div>
+        <div class="fx" id="fx"></div>
+        <button id="cookie" class="cookie" aria-label="Click the cookie">🍪</button>
+      </div>
+
+      <section class="shop">
+        <h2>Shop</h2>
+        <div id="shop" class="shop-list"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
