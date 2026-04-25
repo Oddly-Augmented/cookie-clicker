@@ -36,12 +36,30 @@
         <div class="fx" id="fx"></div>
         <button id="cookie" class="cookie" aria-label="Click the cookie">🍪</button>
       </div>
-
-      <section class="shop">
-        <h2>Shop</h2>
-        <div id="shop" class="shop-list"></div>
-      </section>
     </main>
+
+    <!-- Floating shop button (bottom-center) -->
+    <button id="shopBtn" class="shop-fab" aria-label="Open shop">
+      <span class="shop-fab-emoji">🛒</span>
+      <span class="shop-fab-label">Shop</span>
+      <span id="shopAffordable" class="shop-fab-badge hidden">0</span>
+    </button>
+
+    <!-- Shop drawer (slides up from bottom) -->
+    <div id="shopDrawer" class="drawer-overlay hidden">
+      <div class="drawer">
+        <div class="drawer-handle"></div>
+        <div class="drawer-head">
+          <h2>🛒 Shop</h2>
+          <button id="shopClose" class="ghost" aria-label="Close">×</button>
+        </div>
+        <div class="drawer-tabs">
+          <button class="tab-btn active" data-tab="click">👆 Click</button>
+          <button class="tab-btn"        data-tab="cps">⏱️ Per second</button>
+        </div>
+        <div id="shop" class="shop-list"></div>
+      </div>
+    </div>
 
     <!-- Toast popups (achievements, welcome back, etc.) -->
     <div id="toasts" class="toasts"></div>
@@ -53,7 +71,7 @@
       <button id="addClose" class="ghost" aria-label="Dismiss">×</button>
     </div>
 
-    <!-- Leaderboard modal -->
+    <!-- Leaderboard modal (auto-submits in background — no button) -->
     <div id="lbModal" class="modal-overlay hidden">
       <div class="modal">
         <div class="modal-head">
@@ -62,7 +80,7 @@
         </div>
         <p class="modal-sub">Top 10 all-time cookie bakers</p>
         <div id="lbList" class="lb-list"></div>
-        <button id="lbSubmit" class="submit-btn">Submit My Score</button>
+        <p id="lbYou" class="lb-you"></p>
       </div>
     </div>
 

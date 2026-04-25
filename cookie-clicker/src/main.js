@@ -44,7 +44,8 @@ const defaultState = () => ({
   unlocked: [],
   lastPlayed: Date.now(),
   lastDailyClaim: 0,
-  promptedAdd: false
+  promptedAdd: false,
+  lastSubmittedScore: 0
 });
 
 let state = loadState();
@@ -87,9 +88,13 @@ const countEl    = $('count'),    perClickEl = $('perClick'),  perSecEl = $('per
 const cookieBtn  = $('cookie'),   shopEl     = $('shop'),      fxEl      = $('fx');
 const toastsEl   = $('toasts'),   shareBtn   = $('share'),     lbBtn     = $('lbBtn');
 const addBanner  = $('addBanner'),addBtn     = $('addBtn'),    addClose  = $('addClose');
-const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbSubmit  = $('lbSubmit'), lbClose = $('lbClose');
+const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbClose   = $('lbClose'),  lbYou = $('lbYou');
 const bonusBar   = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
+const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('shopClose'), shopBadge = $('shopAffordable');
+const tabBtns    = document.querySelectorAll('.tab-btn');
 const orbits     = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
+
+let activeTab = 'click'; // current shop tab
 
 // ============================================================
 // Toasts
@@ -105,12 +110,13 @@ function toast(emoji, text, sub = '') {
 }
 
 // ============================================================
-// Shop
+// Shop — items split into Click + CPS tabs
 // ============================================================
 UPGRADES.forEach(u => {
   const row = document.createElement('button');
   row.className = 'shop-item';
   row.dataset.id = u.id;
+  row.dataset.kind = u.kind;
   row.innerHTML = `
     <span class="emoji">${u.emoji}</span>
     <span class="info">
@@ -130,6 +136,28 @@ function buy(u) {
   haptic('light');
   renderOrbits();
   render();
+}
+
+// Tabs
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTab = btn.dataset.tab;
+    tabBtns.forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+});
+
+// Drawer open/close
+shopBtn.addEventListener('click', () => {
+  shopDrawer.classList.remove('hidden');
+  requestAnimationFrame(() => shopDrawer.classList.add('open'));
+  haptic('light');
+});
+shopClose.addEventListener('click', closeShop);
+shopDrawer.addEventListener('click', e => { if (e.target === shopDrawer) closeShop(); });
+function closeShop() {
+  shopDrawer.classList.remove('open');
+  setTimeout(() => shopDrawer.classList.add('hidden'), 250);
 }
 
 // ============================================================
@@ -170,7 +198,6 @@ let bonusActive = false;
 let bonusBarInterval = null;
 
 function scheduleGoldenCookie() {
-  // Appears every 2-5 minutes
   setTimeout(showGoldenCookie, (120 + Math.random() * 180) * 1000);
 }
 
@@ -245,13 +272,26 @@ function render() {
   countEl.textContent    = fmt(state.cookies);
   perClickEl.textContent = fmt(perClick() * (bonusActive ? 5 : 1));
   perSecEl.textContent   = fmt(perSec());
+
+  let affordable = 0;
   shopEl.querySelectorAll('.shop-item').forEach(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
     const c = cost(u);
     row.querySelector('[data-cost]').textContent  = fmt(c);
     row.querySelector('[data-count]').textContent = state.owned[u.id] ? `×${state.owned[u.id]}` : '';
     row.disabled = state.cookies < c;
+    // Hide rows for the inactive tab
+    row.classList.toggle('tab-hidden', row.dataset.kind !== activeTab);
+    if (state.cookies >= c) affordable++;
   });
+
+  // Update floating shop button badge
+  if (affordable > 0) {
+    shopBadge.classList.remove('hidden');
+    shopBadge.textContent = affordable;
+  } else {
+    shopBadge.classList.add('hidden');
+  }
 }
 
 // ============================================================
@@ -307,11 +347,42 @@ function applyDailyBonus() {
 }
 
 // ============================================================
-// Leaderboard
+// Leaderboard — auto-submits in background
 // ============================================================
 async function getContext() {
   try { return await sdk.context; } catch { return null; }
 }
+
+// Try to submit the player's score in the background.
+// Skips if not in Farcaster (no fid) or score hasn't grown enough.
+async function autoSubmitScore() {
+  try {
+    const ctx = await getContext();
+    const fid = ctx?.user?.fid;
+    if (!fid) return;
+
+    const score = Math.floor(state.totalEarned);
+    // Only submit if we've gained at least 10% more cookies since last submit (and at least +50).
+    const minBump = Math.max(50, state.lastSubmittedScore * 0.1);
+    if (score - state.lastSubmittedScore < minBump) return;
+
+    const username = ctx?.user?.username || ctx?.user?.displayName || 'Anonymous';
+    const r = await fetch('/api/leaderboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fid, username, score })
+    });
+    if (r.ok) {
+      state.lastSubmittedScore = score;
+      saveState();
+    }
+  } catch { /* offline or not in Farcaster — fine */ }
+}
+
+// Auto-submit periodically and when the page is hidden.
+setInterval(autoSubmitScore, 30_000);
+document.addEventListener('visibilitychange', () => { if (document.hidden) autoSubmitScore(); });
+window.addEventListener('beforeunload', autoSubmitScore);
 
 lbBtn.addEventListener('click', openLeaderboard);
 lbClose.addEventListener('click', () => lbModal.classList.add('hidden'));
@@ -320,46 +391,49 @@ lbModal.addEventListener('click', e => { if (e.target === lbModal) lbModal.class
 async function openLeaderboard() {
   lbModal.classList.remove('hidden');
   lbList.innerHTML = '<p class="lb-msg">Loading...</p>';
+  lbYou.textContent = '';
+
+  // Submit fresh score before showing the list so the user sees themselves up to date.
+  await autoSubmitScore();
+
   try {
     const r = await fetch('/api/leaderboard');
     const data = await r.json();
-    if (!data.length) { lbList.innerHTML = '<p class="lb-msg">No scores yet — be the first!</p>'; return; }
-    lbList.innerHTML = data.map((row, i) => `
-      <div class="lb-row">
-        <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
-        <span class="lb-name">${row.username}</span>
-        <span class="lb-score">${fmt(row.score)}</span>
-      </div>`).join('');
+
+    if (!data.length) {
+      lbList.innerHTML = '<p class="lb-msg">No scores yet — be the first!</p>';
+    } else {
+      lbList.innerHTML = data.map((row, i) => `
+        <div class="lb-row">
+          <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
+          <span class="lb-name">${escapeHtml(row.username)}</span>
+          <span class="lb-score">${fmt(row.score)}</span>
+        </div>`).join('');
+    }
+
+    // Footer line: where the player stands
+    const ctx = await getContext();
+    if (ctx?.user?.fid) {
+      const me = data.find(r => r.fid === ctx.user.fid);
+      if (me) {
+        const rank = data.indexOf(me) + 1;
+        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} cookies`;
+      } else {
+        lbYou.textContent = `Your score: ${fmt(state.totalEarned)} (keep baking to crack the top 10)`;
+      }
+    } else {
+      lbYou.textContent = 'Open in Farcaster to appear on the leaderboard.';
+    }
   } catch {
     lbList.innerHTML = '<p class="lb-msg">Could not load scores.</p>';
   }
 }
 
-lbSubmit.addEventListener('click', async () => {
-  lbSubmit.disabled = true;
-  lbSubmit.textContent = 'Submitting...';
-  try {
-    const ctx = await getContext();
-    const fid = ctx?.user?.fid;
-    const username = ctx?.user?.username || ctx?.user?.displayName || 'Anonymous';
-    if (!fid) {
-      toast('⚠️', 'Open in Farcaster', 'Sign in to submit your score.');
-      return;
-    }
-    await fetch('/api/leaderboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fid, username, score: Math.floor(state.totalEarned) })
-    });
-    toast('🏆', 'Score submitted!', `${fmt(state.totalEarned)} cookies.`);
-    openLeaderboard();
-  } catch {
-    toast('⚠️', 'Could not submit score');
-  } finally {
-    lbSubmit.disabled = false;
-    lbSubmit.textContent = 'Submit My Score';
-  }
-});
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
 
 // ============================================================
 // Share
@@ -392,19 +466,7 @@ addBtn.addEventListener('click', async () => {
   try {
     await sdk.actions.addMiniApp();
     toast('⭐', 'Added!', 'Cookie Clicker is in your apps.');
-    // Also submit current score so they appear on the leaderboard
-    const ctx = await getContext();
-    if (ctx?.user?.fid) {
-      fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fid: ctx.user.fid,
-          username: ctx.user.username || ctx.user.displayName || 'Anonymous',
-          score: Math.floor(state.totalEarned)
-        })
-      }).catch(() => {});
-    }
+    autoSubmitScore();
   } catch {}
   addBanner.classList.add('hidden');
 });
@@ -427,3 +489,6 @@ render();
 scheduleGoldenCookie();
 
 await sdk.actions.ready();
+
+// Submit shortly after launch so returning players land on the board.
+setTimeout(autoSubmitScore, 5_000);
