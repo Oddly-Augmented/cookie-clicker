@@ -9,9 +9,19 @@
     <meta name="fc:frame" content='{"version":"1","imageUrl":"https://cookie-clicker-hv5w.vercel.app/og.png","button":{"title":"Bake cookies","action":{"type":"launch_frame","name":"Cookie Clicker","url":"https://cookie-clicker-hv5w.vercel.app/","splashImageUrl":"https://cookie-clicker-hv5w.vercel.app/splash.png","splashBackgroundColor":"#fff5e1"}}}' />
   </head>
   <body>
+    <!-- Bonus bar: countdown shown when a Golden Cookie is active -->
+    <div id="bonusBar" class="bonus-bar">
+      <span id="bonusLabel">✨ 5× BONUS — 30s</span>
+      <div id="bonusProgress" class="bonus-progress"></div>
+    </div>
+
     <main class="app">
       <header class="head">
-        <h1>Cookie Clicker</h1>
+        <div class="title-row">
+          <button id="lbBtn"  class="icon-btn" aria-label="Leaderboard">🏆</button>
+          <h1>Cookie Clicker</h1>
+          <button id="share"  class="icon-btn" aria-label="Share score">↗</button>
+        </div>
         <p class="stat"><span id="count">0</span> cookies</p>
         <p class="sub">
           +<span id="perClick">1</span> per click
@@ -20,9 +30,9 @@
       </header>
 
       <div class="stage" id="stage">
-        <div class="orbit orbit-inner"  id="orbit-inner"></div>
-        <div class="orbit orbit-mid"    id="orbit-mid"></div>
-        <div class="orbit orbit-outer"  id="orbit-outer"></div>
+        <div class="orbit orbit-inner" id="orbit-inner"></div>
+        <div class="orbit orbit-mid"   id="orbit-mid"></div>
+        <div class="orbit orbit-outer" id="orbit-outer"></div>
         <div class="fx" id="fx"></div>
         <button id="cookie" class="cookie" aria-label="Click the cookie">🍪</button>
       </div>
@@ -32,6 +42,29 @@
         <div id="shop" class="shop-list"></div>
       </section>
     </main>
+
+    <!-- Toast popups (achievements, welcome back, etc.) -->
+    <div id="toasts" class="toasts"></div>
+
+    <!-- "Add Mini App" prompt -->
+    <div id="addBanner" class="add-banner hidden">
+      <span>Loving it? Add to your apps</span>
+      <button id="addBtn">Add</button>
+      <button id="addClose" class="ghost" aria-label="Dismiss">×</button>
+    </div>
+
+    <!-- Leaderboard modal -->
+    <div id="lbModal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-head">
+          <h2>🏆 Leaderboard</h2>
+          <button id="lbClose" class="ghost" aria-label="Close">×</button>
+        </div>
+        <p class="modal-sub">Top 10 all-time cookie bakers</p>
+        <div id="lbList" class="lb-list"></div>
+        <button id="lbSubmit" class="submit-btn">Submit My Score</button>
+      </div>
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

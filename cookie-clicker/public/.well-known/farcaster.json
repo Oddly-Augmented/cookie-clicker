@@ -8,19 +8,20 @@
     "version": "1",
     "name": "Cookie Clicker",
     "subtitle": "Bake. Click. Repeat.",
-    "description": "A cute idle clicker. Bake cookies, hire grandmas, summon wizards, and watch your bakery empire grow.",
+    "description": "A cozy cookie clicker mini-game. Tap the cookie, hire grandmas, build wizard towers, and climb the leaderboard.",
     "tagline": "One cookie. Infinite cookies.",
     "primaryCategory": "games",
     "tags": ["clicker", "idle", "game", "cookie", "casual"],
     "iconUrl": "https://cookie-clicker-hv5w.vercel.app/icon.png",
     "homeUrl": "https://cookie-clicker-hv5w.vercel.app/",
     "imageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
-    "heroImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
     "buttonTitle": "Bake cookies",
     "splashImageUrl": "https://cookie-clicker-hv5w.vercel.app/splash.png",
     "splashBackgroundColor": "#fff5e1",
+    "heroImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
     "ogTitle": "Cookie Clicker",
-    "ogDescription": "Bake cookies, hire grandmas, summon wizards.",
-    "ogImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png"
+    "ogDescription": "Bake. Click. Repeat. Climb the leaderboard.",
+    "ogImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
+    "webhookUrl": "https://cookie-clicker-hv5w.vercel.app/api/webhook"
   }
 }
