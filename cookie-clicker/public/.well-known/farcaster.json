@@ -1,8 +1,8 @@
 {
   "accountAssociation": {
-    "header": "PASTE_HEADER_FROM_MANIFEST_TOOL",
-    "payload": "PASTE_PAYLOAD_FROM_MANIFEST_TOOL",
-    "signature": "PASTE_SIGNATURE_FROM_MANIFEST_TOOL"
+    "header": "eyJmaWQiOjEwMTQ0NjUsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg3NUE1RTkyYTU0MzM2MTQxZjdhNGQzRTg3ZWViRjU3RTBDZjQyMzlEIn0",
+    "payload": "eyJkb21haW4iOiJjb29raWUtY2xpY2tlci1odjV3LnZlcmNlbC5hcHAifQ",
+    "signature": "3p1CyOUIMgJdMABcHFLeLAuFcewKfcHq9Av+KlrXrHoSpiW2ROkWCWBwfluOhYhbi2f+7z/pxf1brroxyW42Rxs="
   },
   "frame": {
     "version": "1",
