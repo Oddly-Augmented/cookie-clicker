@@ -6,7 +6,11 @@
     <title>Cookie Clicker</title>
 
     <!-- Farcaster Mini App embed: turns a pasted URL into a launchable card in casts. -->
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://cookie-clicker-hv5w.vercel.app/og.png","button":{"title":"Bake cookies","action":{"type":"launch_frame","name":"Cookie Clicker","url":"https://cookie-clicker-hv5w.vercel.app/","splashImageUrl":"https://cookie-clicker-hv5w.vercel.app/splash.png","splashBackgroundColor":"#fff5e1"}}}' />
+    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://cookie-clicker-hv5w.vercel.app/og.png","button":{"title":"Bake cookies","action":{"type":"launch_frame","name":"Cookie Clicker","url":"https://cookie-clicker-hv5w.vercel.app/","splashImageUrl":"https://cookie-clicker-hv5w.vercel.app/splash.png","splashBackgroundColor":"#080418"}}}' />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body>
     <!-- Bonus bar: countdown shown when a Golden Cookie is active -->
@@ -34,7 +38,9 @@
         <div class="orbit orbit-mid"   id="orbit-mid"></div>
         <div class="orbit orbit-outer" id="orbit-outer"></div>
         <div class="fx" id="fx"></div>
-        <button id="cookie" class="cookie" aria-label="Click the cookie">🍪</button>
+        <button id="cookie" class="cookie" aria-label="Click the cookie">
+          <img src="/farcaster-cookie.png" alt="Cookie" draggable="false" />
+        </button>
       </div>
     </main>
 
