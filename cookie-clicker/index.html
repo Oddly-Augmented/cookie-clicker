@@ -71,16 +71,31 @@
       <button id="addClose" class="ghost" aria-label="Dismiss">×</button>
     </div>
 
-    <!-- Leaderboard modal (auto-submits in background — no button) -->
+    <!-- Profile modal: two tabs, Leaderboard + Achievements -->
     <div id="lbModal" class="modal-overlay hidden">
       <div class="modal">
         <div class="modal-head">
-          <h2>🏆 Leaderboard</h2>
+          <h2 id="profileTitle">🏆 Leaderboard</h2>
           <button id="lbClose" class="ghost" aria-label="Close">×</button>
         </div>
-        <p class="modal-sub">Top 10 all-time cookie bakers</p>
-        <div id="lbList" class="lb-list"></div>
-        <p id="lbYou" class="lb-you"></p>
+
+        <div class="drawer-tabs">
+          <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Leaderboard</button>
+          <button class="profile-tab-btn"        data-ptab="achievements">🏅 Achievements</button>
+        </div>
+
+        <!-- Leaderboard pane -->
+        <div id="paneLeaderboard" class="profile-pane">
+          <p class="modal-sub">Top 10 all-time cookie bakers</p>
+          <div id="lbList" class="lb-list"></div>
+          <p id="lbYou" class="lb-you"></p>
+        </div>
+
+        <!-- Achievements pane -->
+        <div id="paneAchievements" class="profile-pane hidden">
+          <p class="modal-sub"><span id="achProgress">0 / 0</span> unlocked</p>
+          <div id="achList" class="ach-list"></div>
+        </div>
       </div>
     </div>
 

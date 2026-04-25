@@ -75,11 +75,19 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 .orbit { transform: translate(-50%, -50%) rotate(0); }
 
 .helper {
+  /* The orbit ring is a 0×0 point at the stage center, so each helper's
+     top-left starts at that center. We give the helper a fixed size and
+     pull it back by half its width/height so it sits CENTERED on its
+     orbit point — otherwise emojis hang off to one side and look
+     off-balance around the cookie. */
   position: absolute; top: 0; left: 0;
-  font-size: 1.4rem; line-height: 1;
+  width: 1.4rem; height: 1.4rem;
+  margin: -0.7rem 0 0 -0.7rem;
+  font-size: 1.4rem; line-height: 1.4rem;
+  text-align: center;
   filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.15));
 }
-.fx-shoot { font-size: 1.5rem; }
+.fx-shoot { font-size: 1.5rem; line-height: 1.4rem; }
 
 .fx { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .sparkle {
@@ -378,6 +386,53 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   padding: 0.75rem 0.5rem 0.25rem;
   border-top: 1px solid #f5e8d0;
 }
+
+/* --- Profile tabs (Leaderboard / Achievements) --- */
+.profile-tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #5a3a1b; opacity: 0.6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font: inherit; font-weight: 700; font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.profile-tab-btn.active {
+  background: white;
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(90, 58, 27, 0.12);
+}
+.profile-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; margin-top: 0.75rem; }
+.profile-pane.hidden { display: none; }
+
+/* --- Achievements list --- */
+.ach-list {
+  flex: 1; overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+.ach-card {
+  background: #fff8ec;
+  border-radius: 14px;
+  padding: 0.75rem 0.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.ach-card.unlocked {
+  background: linear-gradient(180deg, #fff4d1, #ffe3a3);
+  border-color: #ffd166;
+  box-shadow: 0 2px 6px rgba(217, 122, 53, 0.15);
+}
+.ach-card.locked   { opacity: 0.45; filter: grayscale(0.9); }
+.ach-emoji  { font-size: 1.8rem; line-height: 1; }
+.ach-label  { font-size: 0.75rem; font-weight: 700; color: #5a3a1b; line-height: 1.2; }
+.ach-need   { font-size: 0.7rem; opacity: 0.6; font-weight: 600; }
 
 @media (max-width: 380px) {
   .stage  { width: 280px; height: 280px; }

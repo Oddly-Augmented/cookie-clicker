@@ -89,6 +89,11 @@ const cookieBtn  = $('cookie'),   shopEl     = $('shop'),      fxEl      = $('fx
 const toastsEl   = $('toasts'),   shareBtn   = $('share'),     lbBtn     = $('lbBtn');
 const addBanner  = $('addBanner'),addBtn     = $('addBtn'),    addClose  = $('addClose');
 const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbClose   = $('lbClose'),  lbYou = $('lbYou');
+const profileTabs = document.querySelectorAll('.profile-tab-btn');
+const paneLeaderboard = $('paneLeaderboard');
+const paneAchievements = $('paneAchievements');
+const profileTitle = $('profileTitle');
+const achList    = $('achList'),  achProgress = $('achProgress');
 const bonusBar   = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
 const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('shopClose'), shopBadge = $('shopAffordable');
 const tabBtns    = document.querySelectorAll('.tab-btn');
@@ -323,6 +328,21 @@ function checkAchievements() {
   }
 }
 
+// Render the achievement grid with locked/unlocked states.
+function renderAchievements() {
+  const count = state.unlocked.length;
+  achProgress.textContent = `${count} / ${ACHIEVEMENTS.length}`;
+  achList.innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = state.unlocked.includes(a.id);
+    return `
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
+        <span class="ach-emoji">${unlocked ? a.emoji : '\uD83D\uDD12'}</span>
+        <span class="ach-label">${a.label}</span>
+        <span class="ach-need">${fmt(a.need)} cookies</span>
+      </div>`;
+  }).join('');
+}
+
 // ============================================================
 // Offline cookies + daily bonus
 // ============================================================
@@ -384,12 +404,34 @@ setInterval(autoSubmitScore, 30_000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) autoSubmitScore(); });
 window.addEventListener('beforeunload', autoSubmitScore);
 
-lbBtn.addEventListener('click', openLeaderboard);
+lbBtn.addEventListener('click', openProfile);
 lbClose.addEventListener('click', () => lbModal.classList.add('hidden'));
 lbModal.addEventListener('click', e => { if (e.target === lbModal) lbModal.classList.add('hidden'); });
 
-async function openLeaderboard() {
+// Profile tabs: switch between Leaderboard and Achievements
+profileTabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.ptab;
+    profileTabs.forEach(b => b.classList.toggle('active', b === btn));
+    paneLeaderboard.classList.toggle('hidden', tab !== 'leaderboard');
+    paneAchievements.classList.toggle('hidden', tab !== 'achievements');
+    profileTitle.textContent = tab === 'achievements' ? '\uD83C\uDFC5 Achievements' : '\uD83C\uDFC6 Leaderboard';
+    if (tab === 'achievements') renderAchievements();
+  });
+});
+
+async function openProfile() {
   lbModal.classList.remove('hidden');
+  // Default to leaderboard view every open
+  profileTabs.forEach(b => b.classList.toggle('active', b.dataset.ptab === 'leaderboard'));
+  paneLeaderboard.classList.remove('hidden');
+  paneAchievements.classList.add('hidden');
+  profileTitle.textContent = '\uD83C\uDFC6 Leaderboard';
+  renderAchievements(); // keep grid fresh in the background
+  await openLeaderboard();
+}
+
+async function openLeaderboard() {
   lbList.innerHTML = '<p class="lb-msg">Loading...</p>';
   lbYou.textContent = '';
 
