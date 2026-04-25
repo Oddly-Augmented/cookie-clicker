@@ -462,3 +462,50 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   }
   h1 { font-size: 1.35rem; }
 }
+
+/* Tier upgrade bought state */
+.tier-item.bought { opacity: 0.35; pointer-events: none; }
+.tier-item.bought .cost { color: #4caf50; font-weight: 700; }
+
+/* Prestige pane */
+.prestige-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem;
+  padding: 0.75rem; border-radius: 12px;
+  background: rgba(121, 89, 255, 0.08); margin-bottom: 1rem;
+}
+.prestige-stats p { margin: 0; font-size: 0.8rem; color: #ccc; }
+.prestige-stats b { color: #fff; }
+
+.prestige-ascend-box {
+  text-align: center; padding: 1rem; border-radius: 12px;
+  background: rgba(255, 215, 0, 0.06); border: 1px solid rgba(255, 215, 0, 0.15);
+}
+.prestige-ascend-box p { margin: 0.25rem 0; font-size: 0.85rem; color: #ccc; }
+
+.ascend-btn {
+  margin-top: 0.75rem; padding: 0.75rem 2rem; border-radius: 999px;
+  background: linear-gradient(135deg, #7959FF, #b44dff); color: #fff;
+  font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(121, 89, 255, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ascend-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 6px 28px rgba(121, 89, 255, 0.6); }
+.ascend-btn:disabled { opacity: 0.4; cursor: default; }
+
+.prestige-shop { display: flex; flex-direction: column; gap: 0.5rem; }
+.prestige-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0.75rem; border-radius: 10px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  color: #fff; cursor: pointer; text-align: left;
+  transition: background 0.15s;
+}
+.prestige-item:hover:not(:disabled) { background: rgba(121, 89, 255, 0.12); }
+.prestige-item:disabled { opacity: 0.4; cursor: default; }
+.prestige-item.bought { opacity: 0.5; }
+.prestige-item .emoji { font-size: 1.5rem; }
+.prestige-item .info { flex: 1; display: flex; flex-direction: column; }
+.prestige-item .info b { font-size: 0.85rem; }
+.prestige-item .info small { font-size: 0.7rem; opacity: 0.7; }
+.prestige-item .cost { font-size: 0.8rem; font-weight: 700; color: #b388ff; white-space: nowrap; }
+.prestige-item.bought .cost { color: #4caf50; }

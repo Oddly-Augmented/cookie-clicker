@@ -61,7 +61,8 @@
         </div>
         <div class="drawer-tabs">
           <button class="tab-btn active" data-tab="click">👆 Click</button>
-          <button class="tab-btn"        data-tab="cps">⏱️ Per second</button>
+          <button class="tab-btn"        data-tab="cps">⏱️ Auto</button>
+          <button class="tab-btn"        data-tab="upgrade">⬆️ Upgrades</button>
         </div>
         <div id="shop" class="shop-list"></div>
       </div>
@@ -86,8 +87,9 @@
         </div>
 
         <div class="drawer-tabs">
-          <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Leaderboard</button>
-          <button class="profile-tab-btn"        data-ptab="achievements">🏅 Achievements</button>
+          <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
+          <button class="profile-tab-btn"        data-ptab="achievements">🏅 Achieve</button>
+          <button class="profile-tab-btn"        data-ptab="prestige">🔝 Prestige</button>
         </div>
 
         <!-- Leaderboard pane -->
@@ -99,9 +101,12 @@
 
         <!-- Achievements pane -->
         <div id="paneAchievements" class="profile-pane hidden">
-          <p class="modal-sub"><span id="achProgress">0 / 0</span> unlocked</p>
+          <p class="modal-sub"><span id="achProgress">0 / 0</span> unlocked (+1% CpS each)</p>
           <div id="achList" class="ach-list"></div>
         </div>
+
+        <!-- Prestige pane -->
+        <div id="panePrestige" class="profile-pane hidden"></div>
       </div>
     </div>
 

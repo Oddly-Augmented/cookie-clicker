@@ -5,56 +5,134 @@ import { sdk } from '@farcaster/miniapp-sdk';
 // Upgrade definitions
 // ============================================================
 const UPGRADES = [
-  { id: 'cursor',  name: 'Click Bot',     emoji: '🤖',  kind: 'click', power: 1,      baseCost: 10,          orbit: 'inner' },
-  { id: 'spoon',   name: 'Auto-Liker',    emoji: '💜',  kind: 'click', power: 5,      baseCost: 100,         orbit: 'inner' },
-  { id: 'whisk',   name: 'Recast Engine', emoji: '🔁',  kind: 'click', power: 25,     baseCost: 1_500,       orbit: 'inner' },
-  { id: 'mixer',   name: 'Based Node',    emoji: '🔵',  kind: 'click', power: 100,    baseCost: 25_000,      orbit: 'inner' },
-  { id: 'grandma', name: 'Click Farm',    emoji: '📱',  kind: 'cps',   power: 1,      baseCost: 50,          orbit: 'mid' },
-  { id: 'farm',    name: 'AI Clicker',    emoji: '🧠',  kind: 'cps',   power: 5,      baseCost: 500,         orbit: 'mid' },
-  { id: 'mine',    name: 'Crypto Miner',  emoji: '⛏️', kind: 'cps',   power: 25,     baseCost: 5_000,       orbit: 'mid' },
-  { id: 'factory', name: 'Meme Factory',  emoji: '🐸',  kind: 'cps',   power: 100,    baseCost: 50_000,      orbit: 'mid' },
-  { id: 'bank',    name: 'DeFi Protocol', emoji: '🏦',  kind: 'cps',   power: 500,    baseCost: 500_000,     orbit: 'outer' },
-  { id: 'temple',  name: 'Farcaster Hub', emoji: '🟣',  kind: 'cps',   power: 2_500,  baseCost: 5_000_000,   orbit: 'outer' },
-  { id: 'wizard',  name: 'LLM Cluster',   emoji: '🖥️', kind: 'cps',   power: 12_500, baseCost: 50_000_000,  orbit: 'outer', fx: 'shoot' },
-  { id: 'rocket',  name: 'AGI',           emoji: '🌌',  kind: 'cps',   power: 60_000, baseCost: 500_000_000, orbit: 'outer' }
+  { id: 'cursor',  name: 'Click Bot',     emoji: '🤖',  kind: 'click', power: 1,        baseCost: 15,             orbit: 'inner' },
+  { id: 'spoon',   name: 'Auto-Liker',    emoji: '💜',  kind: 'click', power: 5,        baseCost: 100,            orbit: 'inner' },
+  { id: 'whisk',   name: 'Recast Engine', emoji: '🔁',  kind: 'click', power: 25,       baseCost: 1_500,          orbit: 'inner' },
+  { id: 'mixer',   name: 'Based Node',    emoji: '🔵',  kind: 'click', power: 100,      baseCost: 25_000,         orbit: 'inner' },
+  { id: 'grandma', name: 'Click Farm',    emoji: '📱',  kind: 'cps',   power: 1,        baseCost: 50,             orbit: 'mid' },
+  { id: 'farm',    name: 'AI Clicker',    emoji: '🧠',  kind: 'cps',   power: 5,        baseCost: 500,            orbit: 'mid' },
+  { id: 'mine',    name: 'Crypto Miner',  emoji: '⛏️', kind: 'cps',   power: 25,       baseCost: 5_000,          orbit: 'mid' },
+  { id: 'factory', name: 'Meme Factory',  emoji: '🐸',  kind: 'cps',   power: 100,      baseCost: 50_000,         orbit: 'mid' },
+  { id: 'bank',    name: 'DeFi Protocol', emoji: '🏦',  kind: 'cps',   power: 500,      baseCost: 500_000,        orbit: 'outer' },
+  { id: 'temple',  name: 'Farcaster Hub', emoji: '🟣',  kind: 'cps',   power: 2_500,    baseCost: 5_000_000,      orbit: 'outer' },
+  { id: 'wizard',  name: 'LLM Cluster',   emoji: '🖥️', kind: 'cps',   power: 12_500,   baseCost: 50_000_000,     orbit: 'outer', fx: 'shoot' },
+  { id: 'rocket',  name: 'AGI',           emoji: '🌌',  kind: 'cps',   power: 60_000,   baseCost: 500_000_000,    orbit: 'outer' },
+  { id: 'quantum', name: 'Quantum Chain', emoji: '⚛️', kind: 'cps',   power: 250_000,  baseCost: 5_000_000_000,  orbit: 'outer' },
+  { id: 'dao',     name: 'DAO Council',   emoji: '🏛️', kind: 'cps',   power: 1_500_000,baseCost: 50_000_000_000, orbit: 'outer' },
+  { id: 'meta',    name: 'Metaverse',     emoji: '🌐',  kind: 'cps',   power: 10_000_000,baseCost:500_000_000_000, orbit: 'outer' },
+  { id: 'singularity',name:'Singularity', emoji: '✨',  kind: 'cps',   power:100_000_000,baseCost:5_000_000_000_000,orbit:'outer' },
 ];
 
 const COST_MULTIPLIER = 1.15;
-const MAX_PER_TYPE    = 8;
+const MAX_ORBIT = 8; // visual cap only
+
+// --- Tier upgrades (generated): each doubles a building's output ---
+const TIER_DEFS = [
+  { at: 1,  costMult: 10,     tag: 'v2.0' },
+  { at: 5,  costMult: 100,    tag: 'Pro' },
+  { at: 25, costMult: 5_000,  tag: 'Ultra' },
+  { at: 50, costMult: 100_000,tag: 'Quantum' },
+];
+const TIER_UPGRADES = UPGRADES.flatMap(u =>
+  TIER_DEFS.map(t => ({
+    id: `${u.id}_t${t.at}`, buildingId: u.id, name: `${u.name} ${t.tag}`,
+    emoji: u.emoji, need: t.at, cost: Math.ceil(u.baseCost * t.costMult),
+    desc: `${u.name} output ×2`
+  }))
+);
+
+// --- Prestige upgrades (persist across resets) ---
+const PRESTIGE_UPGRADES = [
+  { id: 'genesis',  name: 'Genesis Block',    emoji: '🧱', cost: 1,   desc: 'Start each run with 1,000 cookies' },
+  { id: 'diamond',  name: 'Diamond Hands',    emoji: '💎', cost: 3,   desc: '+25% offline earnings' },
+  { id: 'moon',     name: 'Moon Math',        emoji: '🌙', cost: 5,   desc: 'Golden cookies 2× more often' },
+  { id: 'whale',    name: 'Whale Wallet',     emoji: '🐋', cost: 10,  desc: 'Start with 1 free Click Farm' },
+  { id: 'protocol', name: 'Protocol Upgrade', emoji: '⬆️', cost: 25,  desc: '+50% all building output' },
+  { id: 'lucky',    name: 'Lucky Drops',      emoji: '🍀', cost: 15,  desc: 'Golden cookie bonus is 10×' },
+  { id: 'fomo',     name: 'FOMO Shield',      emoji: '🛡️', cost: 20,  desc: 'Daily bonus is 3× larger' },
+  { id: 'recursive',name: 'Recursive AGI',    emoji: '🔄', cost: 50,  desc: 'Prestige chips give +2% CpS' },
+  { id: 'wagmi',    name: 'WAGMI',            emoji: '🚀', cost: 100, desc: 'All CpS ×2' },
+];
 
 const ACHIEVEMENTS = [
-  { id: 'first',   need: 1,             label: 'First cookie',       emoji: '🍪' },
-  { id: 'ten',     need: 10,            label: '10 cookies',         emoji: '🥠' },
-  { id: 'hundred', need: 100,           label: '100 cookies',        emoji: '✨' },
-  { id: 'k',       need: 1_000,         label: 'A thousand!',        emoji: '🎉' },
-  { id: 'tenk',    need: 10_000,        label: '10K club',           emoji: '🌟' },
-  { id: 'm',       need: 1_000_000,     label: 'Cookie millionaire', emoji: '💎' },
-  { id: 'b',       need: 1_000_000_000, label: 'Cookie billionaire', emoji: '👑' }
+  // Cookie milestones
+  { id: 'c1',    need: 1,               label: 'First Click',        emoji: '🍪', kind: 'cookies' },
+  { id: 'c2',    need: 100,             label: 'Getting Started',    emoji: '🥠', kind: 'cookies' },
+  { id: 'c3',    need: 1_000,           label: 'A Thousand!',        emoji: '🎉', kind: 'cookies' },
+  { id: 'c4',    need: 10_000,          label: '10K Club',           emoji: '🌟', kind: 'cookies' },
+  { id: 'c5',    need: 100_000,         label: 'Six Figures',        emoji: '💰', kind: 'cookies' },
+  { id: 'c6',    need: 1_000_000,       label: 'Millionaire',        emoji: '💎', kind: 'cookies' },
+  { id: 'c7',    need: 10_000_000,      label: 'Deca-Millionaire',   emoji: '💫', kind: 'cookies' },
+  { id: 'c8',    need: 100_000_000,     label: 'Centimillionaire',   emoji: '🌕', kind: 'cookies' },
+  { id: 'c9',    need: 1_000_000_000,   label: 'Billionaire',        emoji: '👑', kind: 'cookies' },
+  { id: 'c10',   need: 100_000_000_000, label: 'Cookie Whale',       emoji: '🐋', kind: 'cookies' },
+  // Click milestones
+  { id: 'cl1',   need: 100,     label: '100 Clicks',         emoji: '👆', kind: 'clicks' },
+  { id: 'cl2',   need: 1_000,   label: '1K Clicks',          emoji: '✋', kind: 'clicks' },
+  { id: 'cl3',   need: 10_000,  label: '10K Clicks',         emoji: '💪', kind: 'clicks' },
+  { id: 'cl4',   need: 100_000, label: '100K Clicks',        emoji: '🤖', kind: 'clicks' },
+  // Building milestones
+  { id: 'b1',    need: 1,   label: 'First Purchase',     emoji: '📝', kind: 'buildings' },
+  { id: 'b2',    need: 10,  label: '10 Buildings',       emoji: '🏗️', kind: 'buildings' },
+  { id: 'b3',    need: 50,  label: '50 Buildings',       emoji: '🏢', kind: 'buildings' },
+  { id: 'b4',    need: 100, label: '100 Buildings',      emoji: '🏙️', kind: 'buildings' },
+  { id: 'b5',    need: 200, label: '200 Buildings',      emoji: '🌆', kind: 'buildings' },
+  // Tier milestones
+  { id: 't1',    need: 1,   label: 'First Upgrade',      emoji: '⬆️', kind: 'tiers' },
+  { id: 't2',    need: 10,  label: '10 Upgrades',        emoji: '🔧', kind: 'tiers' },
+  { id: 't3',    need: 25,  label: '25 Upgrades',        emoji: '⚙️', kind: 'tiers' },
+  // Prestige milestones
+  { id: 'p1',    need: 1,   label: 'First Ascension',    emoji: '🔝', kind: 'ascensions' },
+  { id: 'p2',    need: 3,   label: 'Triple Ascension',   emoji: '♾️', kind: 'ascensions' },
+  { id: 'p3',    need: 10,  label: 'Ascension Master',   emoji: '🌠', kind: 'ascensions' },
+  // Special
+  { id: 'sg',    need: 1_000_000, label: '1M CpS',        emoji: '⚡', kind: 'cps' },
 ];
 
 // ============================================================
 // State (persisted in localStorage)
 // ============================================================
-const SAVE_KEY = 'cookieClicker:v1';
+const SAVE_KEY = 'farClick:v2';
 
 const defaultState = () => ({
   cookies: 0,
   totalEarned: 0,
+  lifetimeEarned: 0,
+  totalClicks: 0,
   owned: Object.fromEntries(UPGRADES.map(u => [u.id, 0])),
+  tiersBought: [],
   unlocked: [],
+  // Prestige
+  prestigeLevel: 0,
+  prestigeChips: 0,
+  prestigeUpgrades: [],
+  ascensions: 0,
+  // Meta
   lastPlayed: Date.now(),
   lastDailyClaim: 0,
   promptedAdd: false,
   lastSubmittedScore: 0
 });
 
+// Migrate from v1 save
+function migrateV1() {
+  try {
+    const old = localStorage.getItem('cookieClicker:v1');
+    if (!old) return null;
+    const d = JSON.parse(old);
+    return { ...defaultState(), ...d, lifetimeEarned: d.totalEarned || 0, totalClicks: 0, tiersBought: [], prestigeLevel: 0, prestigeChips: 0, prestigeUpgrades: [], ascensions: 0 };
+  } catch { return null; }
+}
+
 let state = loadState();
 
 function loadState() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return defaultState();
-    return { ...defaultState(), ...JSON.parse(raw) };
+    if (raw) return { ...defaultState(), ...JSON.parse(raw) };
+    const migrated = migrateV1();
+    if (migrated) return migrated;
+    return defaultState();
   } catch { return defaultState(); }
 }
 function saveState() {
@@ -69,8 +147,27 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) saveS
 // Helpers
 // ============================================================
 const cost     = u => Math.ceil(u.baseCost * COST_MULTIPLIER ** state.owned[u.id]);
-const perClick = () => 1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id], 0);
-const perSec   = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id], 0);
+
+// Multiplier from tier upgrades for a building
+const tierMult = uid => Math.pow(2, TIER_UPGRADES.filter(t => t.buildingId === uid && state.tiersBought.includes(t.id)).length);
+
+// Global multipliers
+const milkMult     = () => 1 + state.unlocked.length * 0.01;
+const prestigeMult = () => {
+  const rate = state.prestigeUpgrades.includes('recursive') ? 2 : 1;
+  return 1 + state.prestigeLevel * rate / 100;
+};
+const protocolMult = () => state.prestigeUpgrades.includes('protocol') ? 1.5 : 1;
+const wagmiMult    = () => state.prestigeUpgrades.includes('wagmi') ? 2 : 1;
+const globalMult   = () => milkMult() * prestigeMult() * protocolMult() * wagmiMult();
+
+const perClick = () => (1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0)) * globalMult();
+const perSec   = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult();
+
+// Prestige calculation
+const calcPrestigeLevel = () => Math.floor(Math.sqrt(state.lifetimeEarned / 1e9));
+const newChipsOnAscend  = () => Math.max(0, calcPrestigeLevel() - state.prestigeLevel);
+const totalBuildings    = () => Object.values(state.owned).reduce((a, b) => a + b, 0);
 
 const fmt = n => {
   if (n < 1_000) return Math.floor(n).toString();
@@ -133,6 +230,34 @@ UPGRADES.forEach(u => {
   shopEl.appendChild(row);
 });
 
+// Tier upgrade rows
+TIER_UPGRADES.forEach(t => {
+  const row = document.createElement('button');
+  row.className = 'shop-item tier-item';
+  row.dataset.id = t.id;
+  row.dataset.kind = 'upgrade';
+  row.innerHTML = `
+    <span class="emoji">${t.emoji}</span>
+    <span class="info">
+      <span class="name">${t.name}</span>
+      <span class="effect">${t.desc} (need ${t.need})</span>
+    </span>
+    <span class="cost" data-cost>${fmt(t.cost)}</span>`;
+  row.addEventListener('click', () => buyTier(t));
+  shopEl.appendChild(row);
+});
+
+function buyTier(t) {
+  if (state.tiersBought.includes(t.id)) return;
+  if (state.owned[t.buildingId] < t.need) return;
+  if (state.cookies < t.cost) return;
+  state.cookies -= t.cost;
+  state.tiersBought.push(t.id);
+  toast(t.emoji, t.name, t.desc);
+  haptic('medium');
+  render();
+}
+
 function buy(u) {
   const c = cost(u);
   if (state.cookies < c) return;
@@ -172,7 +297,7 @@ function renderOrbits() {
   for (const ring of Object.values(orbits)) ring.innerHTML = '';
   const groups = { inner: [], mid: [], outer: [] };
   for (const u of UPGRADES) {
-    const n = Math.min(state.owned[u.id], MAX_PER_TYPE);
+    const n = Math.min(state.owned[u.id], MAX_ORBIT);
     for (let i = 0; i < n; i++) groups[u.orbit].push(u);
   }
   for (const [ring, list] of Object.entries(groups)) {
@@ -203,7 +328,8 @@ let bonusActive = false;
 let bonusBarInterval = null;
 
 function scheduleGoldenCookie() {
-  setTimeout(showGoldenCookie, (120 + Math.random() * 180) * 1000);
+  const delay = state.prestigeUpgrades.includes('moon') ? 0.5 : 1;
+  setTimeout(showGoldenCookie, (120 + Math.random() * 180) * 1000 * delay);
 }
 
 function showGoldenCookie() {
@@ -249,7 +375,8 @@ function activateBonus() {
     }
   }, 200);
 
-  toast('✨', 'Golden Cookie!', '5× cookies per click for 30 seconds!');
+  const bonusMult = state.prestigeUpgrades.includes('lucky') ? 10 : 5;
+  toast('✨', 'Golden Cookie!', `${bonusMult}× cookies per click for 30 seconds!`);
   haptic('heavy');
   scheduleGoldenCookie();
 }
@@ -258,9 +385,12 @@ function activateBonus() {
 // Click cookie
 // ============================================================
 cookieBtn.addEventListener('click', () => {
-  const gained = perClick() * (bonusActive ? 5 : 1);
+  const bonusMult = bonusActive ? (state.prestigeUpgrades.includes('lucky') ? 10 : 5) : 1;
+  const gained = perClick() * bonusMult;
   state.cookies += gained;
   state.totalEarned += gained;
+  state.lifetimeEarned += gained;
+  state.totalClicks += 1;
   haptic('light');
   cookieBtn.classList.remove('pop');
   void cookieBtn.offsetWidth;
@@ -275,19 +405,36 @@ cookieBtn.addEventListener('click', () => {
 // ============================================================
 function render() {
   countEl.textContent    = fmt(state.cookies);
-  perClickEl.textContent = fmt(perClick() * (bonusActive ? 5 : 1));
+  const bonusMult = bonusActive ? (state.prestigeUpgrades.includes('lucky') ? 10 : 5) : 1;
+  perClickEl.textContent = fmt(perClick() * bonusMult);
   perSecEl.textContent   = fmt(perSec());
 
   let affordable = 0;
-  shopEl.querySelectorAll('.shop-item').forEach(row => {
+  shopEl.querySelectorAll('.shop-item:not(.tier-item)').forEach(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
+    if (!u) return;
     const c = cost(u);
     row.querySelector('[data-cost]').textContent  = fmt(c);
     row.querySelector('[data-count]').textContent = state.owned[u.id] ? `×${state.owned[u.id]}` : '';
     row.disabled = state.cookies < c;
-    // Hide rows for the inactive tab
     row.classList.toggle('tab-hidden', row.dataset.kind !== activeTab);
     if (state.cookies >= c) affordable++;
+  });
+
+  // Tier upgrade rows
+  shopEl.querySelectorAll('.tier-item').forEach(row => {
+    const t = TIER_UPGRADES.find(x => x.id === row.dataset.id);
+    if (!t) return;
+    const bought = state.tiersBought.includes(t.id);
+    const unlocked = state.owned[t.buildingId] >= t.need;
+    const canAfford = state.cookies >= t.cost;
+    row.disabled = bought || !unlocked || !canAfford;
+    row.classList.toggle('tab-hidden', activeTab !== 'upgrade');
+    row.classList.toggle('bought', bought);
+    if (bought) { row.querySelector('[data-cost]').textContent = '✔'; }
+    if (!unlocked && !bought) { row.querySelector('[data-cost]').textContent = '🔒'; }
+    if (unlocked && !bought) { row.querySelector('[data-cost]').textContent = fmt(t.cost); }
+    if (canAfford && unlocked && !bought) affordable++;
   });
 
   // Update floating shop button badge
@@ -310,6 +457,7 @@ setInterval(() => {
   const gained = perSec() * dt;
   state.cookies += gained;
   state.totalEarned += gained;
+  state.lifetimeEarned += gained;
   render();
   checkAchievements();
 }, 100);
@@ -320,7 +468,15 @@ setInterval(spawnSparkle, 700);
 // ============================================================
 function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
-    if (state.totalEarned >= a.need && !state.unlocked.includes(a.id)) {
+    if (state.unlocked.includes(a.id)) continue;
+    let val = 0;
+    if (a.kind === 'cookies')    val = state.lifetimeEarned;
+    if (a.kind === 'clicks')     val = state.totalClicks;
+    if (a.kind === 'buildings')  val = totalBuildings();
+    if (a.kind === 'tiers')      val = state.tiersBought.length;
+    if (a.kind === 'ascensions') val = state.ascensions;
+    if (a.kind === 'cps')        val = perSec();
+    if (val >= a.need) {
       state.unlocked.push(a.id);
       toast(a.emoji, 'Achievement: ' + a.label);
       haptic('medium');
@@ -350,18 +506,22 @@ function applyOfflineEarnings() {
   if (!state.lastPlayed) return;
   const seconds = Math.min((Date.now() - state.lastPlayed) / 1000, 60 * 60 * 8);
   if (seconds < 30) return;
-  const earned = perSec() * seconds * 0.5;
+  const offlineMult = state.prestigeUpgrades.includes('diamond') ? 0.625 : 0.5;
+  const earned = perSec() * seconds * offlineMult;
   if (earned < 1) return;
   state.cookies += earned;
   state.totalEarned += earned;
-  toast('🌙', 'Welcome back!', `Your bakers made ${fmt(earned)} cookies while you were away.`);
+  state.lifetimeEarned += earned;
+  toast('🌙', 'Welcome back!', `Your bots made ${fmt(earned)} cookies while you were away.`);
 }
 function applyDailyBonus() {
   const now = Date.now();
   if (now - state.lastDailyClaim < 24 * 60 * 60 * 1000) return;
-  const bonus = Math.max(50, perSec() * 60 * 5);
+  const mult = state.prestigeUpgrades.includes('fomo') ? 3 : 1;
+  const bonus = Math.max(50, perSec() * 60 * 5) * mult;
   state.cookies += bonus;
   state.totalEarned += bonus;
+  state.lifetimeEarned += bonus;
   state.lastDailyClaim = now;
   setTimeout(() => toast('🎁', 'Daily bonus!', `+${fmt(bonus)} cookies. Come back tomorrow!`), 1200);
 }
@@ -408,15 +568,19 @@ lbBtn.addEventListener('click', openProfile);
 lbClose.addEventListener('click', () => lbModal.classList.add('hidden'));
 lbModal.addEventListener('click', e => { if (e.target === lbModal) lbModal.classList.add('hidden'); });
 
-// Profile tabs: switch between Leaderboard and Achievements
+// Profile tabs: switch between Leaderboard, Achievements, and Prestige
 profileTabs.forEach(btn => {
   btn.addEventListener('click', () => {
     const tab = btn.dataset.ptab;
     profileTabs.forEach(b => b.classList.toggle('active', b === btn));
     paneLeaderboard.classList.toggle('hidden', tab !== 'leaderboard');
     paneAchievements.classList.toggle('hidden', tab !== 'achievements');
-    profileTitle.textContent = tab === 'achievements' ? '\uD83C\uDFC5 Achievements' : '\uD83C\uDFC6 Leaderboard';
+    const panePrestige = $('panePrestige');
+    if (panePrestige) panePrestige.classList.toggle('hidden', tab !== 'prestige');
+    const titles = { leaderboard: '🏆 Leaderboard', achievements: '🏅 Achievements', prestige: '🔝 Prestige' };
+    profileTitle.textContent = titles[tab] || '';
     if (tab === 'achievements') renderAchievements();
+    if (tab === 'prestige') renderPrestige();
   });
 });
 
@@ -513,6 +677,84 @@ addBtn.addEventListener('click', async () => {
   addBanner.classList.add('hidden');
 });
 addClose.addEventListener('click', () => addBanner.classList.add('hidden'));
+
+// ============================================================
+// Prestige / Ascend
+// ============================================================
+function renderPrestige() {
+  const pane = $('panePrestige');
+  if (!pane) return;
+  const newChips = newChipsOnAscend();
+  pane.innerHTML = `
+    <div class="prestige-stats">
+      <p>📊 <b>Prestige Level:</b> ${state.prestigeLevel}</p>
+      <p>💠 <b>Chips Available:</b> ${state.prestigeChips}</p>
+      <p>⚡ <b>CpS Bonus:</b> +${(state.prestigeLevel * (state.prestigeUpgrades.includes('recursive') ? 2 : 1))}%</p>
+      <p>🍪 <b>Lifetime Cookies:</b> ${fmt(state.lifetimeEarned)}</p>
+      <p>👆 <b>Total Clicks:</b> ${fmt(state.totalClicks)}</p>
+      <p>♾️ <b>Ascensions:</b> ${state.ascensions}</p>
+      <p>🧱 <b>Buildings Owned:</b> ${totalBuildings()}</p>
+      <p>⬆️ <b>Tier Upgrades:</b> ${state.tiersBought.length}</p>
+    </div>
+    <div class="prestige-ascend-box">
+      <p>Ascending resets cookies, buildings & upgrades but gives you <b>permanent CpS bonuses</b>.</p>
+      <p>You would earn <b>${newChips}</b> new prestige chip${newChips !== 1 ? 's' : ''} 💠</p>
+      <button id="ascendBtn" class="ascend-btn" ${newChips < 1 ? 'disabled' : ''}>🔝 Ascend${newChips > 0 ? ` (+${newChips} chips)` : ''}</button>
+    </div>
+    <h3 style="margin-top:1rem">Prestige Shop</h3>
+    <div class="prestige-shop">
+      ${PRESTIGE_UPGRADES.map(pu => {
+        const owned = state.prestigeUpgrades.includes(pu.id);
+        const canBuy = !owned && state.prestigeChips >= pu.cost;
+        return `<button class="prestige-item ${owned ? 'bought' : ''} ${canBuy ? 'affordable' : ''}" data-pid="${pu.id}" ${owned || !canBuy ? 'disabled' : ''}>
+          <span class="emoji">${pu.emoji}</span>
+          <span class="info"><b>${pu.name}</b><small>${pu.desc}</small></span>
+          <span class="cost">${owned ? '✔' : pu.cost + ' 💠'}</span>
+        </button>`;
+      }).join('')}
+    </div>`;
+  // Bind ascend button
+  const ascBtn = $('ascendBtn');
+  if (ascBtn) ascBtn.addEventListener('click', doAscend);
+  // Bind prestige shop buttons
+  pane.querySelectorAll('.prestige-item:not(.bought)').forEach(btn => {
+    btn.addEventListener('click', () => buyPrestigeUpgrade(btn.dataset.pid));
+  });
+}
+
+function doAscend() {
+  const chips = newChipsOnAscend();
+  if (chips < 1) return;
+  state.prestigeLevel += chips;
+  state.prestigeChips += chips;
+  state.ascensions += 1;
+  // Reset run state
+  state.cookies = state.prestigeUpgrades.includes('genesis') ? 1000 : 0;
+  state.totalEarned = 0;
+  state.owned = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
+  if (state.prestigeUpgrades.includes('whale')) state.owned.grandma = 1;
+  state.tiersBought = [];
+  state.unlocked = [];
+  // Re-render everything
+  renderOrbits();
+  render();
+  renderPrestige();
+  saveState();
+  toast('🔝', 'Ascended!', `+${chips} prestige chips. Your empire grows stronger.`);
+  haptic('heavy');
+}
+
+function buyPrestigeUpgrade(id) {
+  const pu = PRESTIGE_UPGRADES.find(p => p.id === id);
+  if (!pu || state.prestigeUpgrades.includes(id)) return;
+  if (state.prestigeChips < pu.cost) return;
+  state.prestigeChips -= pu.cost;
+  state.prestigeUpgrades.push(id);
+  toast(pu.emoji, pu.name, pu.desc);
+  haptic('medium');
+  saveState();
+  renderPrestige();
+}
 
 // ============================================================
 // Haptics
