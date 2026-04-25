@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "PASTE_HEADER_FROM_MANIFEST_TOOL",
+    "payload": "PASTE_PAYLOAD_FROM_MANIFEST_TOOL",
+    "signature": "PASTE_SIGNATURE_FROM_MANIFEST_TOOL"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Cookie Clicker",
+    "iconUrl": "https://cookie-clicker-hv5w.vercel.app/icon.png",
+    "homeUrl": "https://cookie-clicker-hv5w.vercel.app/",
+    "imageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
+    "buttonTitle": "Bake cookies",
+    "splashImageUrl": "https://cookie-clicker-hv5w.vercel.app/splash.png",
+    "splashBackgroundColor": "#fff5e1"
+  }
+}
