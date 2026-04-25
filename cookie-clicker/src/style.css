@@ -6,6 +6,7 @@ html, body {
   background: linear-gradient(180deg, #180D39, #080418);
   color: #FFFFFF;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 .app {
@@ -49,15 +50,12 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 }
 .cookie {
   position: relative; z-index: 2;
+  font-size: 6.5rem; line-height: 1;
   background: none; border: none; cursor: pointer;
-  padding: 0;
+  padding: 0.5rem;
+  filter: drop-shadow(0 0 40px rgba(121, 89, 255, 0.8));
   user-select: none;
   transition: transform 0.05s ease;
-}
-.cookie img {
-  width: 220px; height: 220px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 40px rgba(121, 89, 255, 0.5));
 }
 .cookie:active { transform: scale(0.92); }
 .cookie.pop    { animation: pop 0.15s ease; }
@@ -448,7 +446,7 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 
 @media (max-width: 380px) {
   .stage  { width: 280px; height: 280px; }
-  .cookie img { width: 180px; height: 180px; }
+  .cookie { font-size: 5.5rem; }
   .orbit-inner { --r: 75px;  }
   .orbit-mid   { --r: 115px; }
   .orbit-outer { --r: 150px; }

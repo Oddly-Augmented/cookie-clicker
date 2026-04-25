@@ -483,7 +483,7 @@ function escapeHtml(s) {
 shareBtn.addEventListener('click', async () => {
   try {
     await sdk.actions.composeCast({
-      text: `I've baked ${fmt(state.totalEarned)} cookies in Cookie Clicker 🍪 think you can beat me?`,
+      text: `I've baked ${fmt(state.totalEarned)} cookies in FarClicker 🍪 think you can beat me?`,
       embeds: ['https://cookie-clicker-hv5w.vercel.app/']
     });
   } catch {
@@ -507,7 +507,7 @@ function maybePromptAdd() {
 addBtn.addEventListener('click', async () => {
   try {
     await sdk.actions.addMiniApp();
-    toast('⭐', 'Added!', 'Cookie Clicker is in your apps.');
+    toast('⭐', 'Added!', 'FarClicker is in your apps.');
     autoSubmitScore();
   } catch {}
   addBanner.classList.add('hidden');

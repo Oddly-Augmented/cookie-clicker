@@ -6,7 +6,7 @@
   },
   "frame": {
     "version": "1",
-    "name": "Cookie Clicker",
+    "name": "FarClicker",
     "subtitle": "Bake. Click. Repeat.",
     "description": "A cozy cookie clicker mini-game. Tap the cookie, hire grandmas, build wizard towers, and climb the leaderboard.",
     "tagline": "One cookie. Infinite cookies.",
@@ -17,9 +17,9 @@
     "imageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
     "buttonTitle": "Bake cookies",
     "splashImageUrl": "https://cookie-clicker-hv5w.vercel.app/splash.png",
-    "splashBackgroundColor": "#fff5e1",
+    "splashBackgroundColor": "#080418",
     "heroImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
-    "ogTitle": "Cookie Clicker",
+    "ogTitle": "FarClicker",
     "ogDescription": "Bake. Click. Repeat. Climb the leaderboard.",
     "ogImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
     "webhookUrl": "https://cookie-clicker-hv5w.vercel.app/api/webhook"
