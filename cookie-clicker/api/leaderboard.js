@@ -5,27 +5,35 @@
 // POST /api/leaderboard       → upsert score (only if higher)
 // ============================================================
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+import { getSupabase } from './_supabase.js';
 
 export default async function handler(req, res) {
+  let supabase;
+  try {
+    supabase = getSupabase();
+  } catch (err) {
+    console.error('Leaderboard config error:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+
   // ---- GET: top 10 scores ----
   if (req.method === 'GET') {
-    const { data, error } = await supabase
-      .from('leaderboard')
-      .select('fid, username, score')
-      .order('score', { ascending: false })
-      .limit(10);
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('fid, username, score')
+        .order('score', { ascending: false })
+        .limit(10);
 
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Could not load scores' });
+      if (error) {
+        console.error('Leaderboard SELECT error:', error);
+        return res.status(500).json({ error: error.message || 'Could not load scores' });
+      }
+      return res.status(200).json(data || []);
+    } catch (err) {
+      console.error('Leaderboard GET unexpected:', err);
+      return res.status(500).json({ error: err.message || 'Internal error' });
     }
-    return res.status(200).json(data || []);
   }
 
   // ---- POST: submit score ----
@@ -37,17 +45,22 @@ export default async function handler(req, res) {
       }
 
       // Only update if the new score is higher than the existing one.
-      const { data: existing } = await supabase
+      const { data: existing, error: selectErr } = await supabase
         .from('leaderboard')
         .select('score')
         .eq('fid', fid)
         .maybeSingle();
 
+      if (selectErr) {
+        console.error('Leaderboard SELECT (post) error:', selectErr);
+        return res.status(500).json({ error: selectErr.message });
+      }
+
       if (existing && existing.score >= score) {
         return res.status(200).json({ ok: true, updated: false });
       }
 
-      const { error } = await supabase
+      const { error: upsertErr } = await supabase
         .from('leaderboard')
         .upsert({
           fid,
@@ -56,14 +69,14 @@ export default async function handler(req, res) {
           updated_at: new Date().toISOString()
         }, { onConflict: 'fid' });
 
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Could not save score' });
+      if (upsertErr) {
+        console.error('Leaderboard UPSERT error:', upsertErr);
+        return res.status(500).json({ error: upsertErr.message });
       }
       return res.status(200).json({ ok: true, updated: true });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Internal error' });
+      console.error('Leaderboard POST unexpected:', err);
+      return res.status(500).json({ error: err.message || 'Internal error' });
     }
   }
 

@@ -6,13 +6,8 @@
 // request), and sends a friendly "come back and bake" reminder.
 // ============================================================
 
-import { createClient } from '@supabase/supabase-js';
+import { getSupabase } from './_supabase.js';
 import { randomUUID } from 'node:crypto';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
 
 const MESSAGES = [
   { title: 'Your bakers miss you',     body: 'Pop in and collect your daily bonus.' },
@@ -23,9 +18,16 @@ const MESSAGES = [
 ];
 
 export default async function handler(req, res) {
-  // Vercel cron sends GET with an Authorization header; allow both methods.
   if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  let supabase;
+  try {
+    supabase = getSupabase();
+  } catch (err) {
+    console.error('Notify config error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 
   try {
@@ -48,7 +50,6 @@ export default async function handler(req, res) {
       byUrl.get(row.url).push(row.token);
     }
 
-    // Pick today's message.
     const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
     const targetUrl = 'https://cookie-clicker-hv5w.vercel.app/';
     const notificationId = randomUUID();
@@ -57,7 +58,6 @@ export default async function handler(req, res) {
     const errors = [];
 
     for (const [url, tokens] of byUrl.entries()) {
-      // Farcaster requires batches of at most 100 tokens.
       for (let i = 0; i < tokens.length; i += 100) {
         const batch = tokens.slice(i, i + 100);
         try {
@@ -75,7 +75,6 @@ export default async function handler(req, res) {
           if (!r.ok) errors.push(`${url}: ${r.status}`);
           else totalSent += batch.length;
 
-          // Clean up tokens the server says are invalid.
           try {
             const result = await r.json();
             const invalid = [
