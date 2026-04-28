@@ -414,7 +414,11 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   flex: 1; overflow-y: auto;
   margin-bottom: 0.75rem;
   min-height: 100px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.lb-list::-webkit-scrollbar { display: none; }
+
 .lb-row {
   display: flex; align-items: center; gap: 0.5rem;
   padding: 0.55rem 0;
@@ -422,7 +426,18 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 }
 .lb-row:last-child { border-bottom: none; }
 .lb-rank  { font-size: 1.1rem; width: 2rem; text-align: center; font-weight: 700; color: #7959FF; flex-shrink: 0; }
-.lb-name  { flex: 1; font-weight: 600; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 0.35rem; }
+.lb-name-row {
+  flex: 1; display: flex; align-items: center; gap: 0.35rem; min-width: 0;
+}
+.lb-name-text {
+  font-weight: 600; font-size: 0.95rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lb-name-text.golden {
+  color: #FFD700;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+  font-weight: 800;
+}
 .lb-plevel {
   font-size: 0.7rem; font-weight: 700; color: #b388ff;
   background: rgba(121, 89, 255, 0.15); padding: 0.1rem 0.35rem;

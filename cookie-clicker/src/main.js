@@ -877,7 +877,8 @@ async function autoSubmitScore() {
       body: JSON.stringify({
         fid, username, score,
         prestige_level: state.prestigeLevel || 0,
-        ascensions: state.ascensions || 0
+        ascensions: state.ascensions || 0,
+        has_nft: state.ownsGoldenNFT || false
       })
     });
     if (r.ok) {
@@ -939,12 +940,19 @@ async function openLeaderboard() {
     if (!data.length) {
       lbList.innerHTML = '<p class="lb-msg">No scores yet — be the first!</p>';
     } else {
-      lbList.innerHTML = data.map((row, i) => `
+      lbList.innerHTML = data.map((row, i) => {
+        const isGolden = row.has_nft === true;
+        const displayName = row.username;
+        return `
         <div class="lb-row">
           <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
-          <span class="lb-name">${escapeHtml(row.username)}<span class="lb-plevel">🔝${row.prestige_level || 0}</span></span>
+          <span class="lb-name-row">
+            <span class="lb-name-text ${isGolden ? 'golden' : ''}">${escapeHtml(displayName)}</span>
+            <span class="lb-plevel">🔝${row.prestige_level || 0}</span>
+          </span>
           <span class="lb-score">${fmt(row.score)}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     // Footer line: where the player stands

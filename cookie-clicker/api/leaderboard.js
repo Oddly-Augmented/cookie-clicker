@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     try {
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('fid, username, score, prestige_level, ascensions')
+        .select('fid, username, score, prestige_level, ascensions, has_nft')
         .order('score', { ascending: false })
         .limit(100);
 
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   // ---- POST: submit score with prestige ----
   if (req.method === 'POST') {
     try {
-      const { fid, username, score, prestige_level, ascensions } = req.body || {};
+      const { fid, username, score, prestige_level, ascensions, has_nft } = req.body || {};
       if (!fid || typeof score !== 'number') {
         return res.status(400).json({ error: 'fid and numeric score required' });
       }
@@ -68,6 +68,7 @@ export default async function handler(req, res) {
           score,
           prestige_level: prestige_level || 0,
           ascensions: ascensions || 0,
+          has_nft: has_nft || false,
           updated_at: new Date().toISOString()
         }, { onConflict: 'fid' });
 
