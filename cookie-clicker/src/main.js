@@ -410,21 +410,35 @@ function render() {
   perSecEl.textContent   = fmt(perSec());
 
   let affordable = 0;
-  shopEl.querySelectorAll('.shop-item:not(.tier-item)').forEach(row => {
+
+  // Collect and sort regular upgrade rows
+  const regularRows = Array.from(shopEl.querySelectorAll('.shop-item:not(.tier-item)'));
+  const regularRowData = regularRows.map(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
-    if (!u) return;
+    if (!u) return { row, canAfford: false };
     const c = cost(u);
     row.querySelector('[data-cost]').textContent  = fmt(c);
     row.querySelector('[data-count]').textContent = state.owned[u.id] ? `×${state.owned[u.id]}` : '';
-    row.disabled = state.cookies < c;
+    const canAfford = state.cookies >= c;
+    row.disabled = !canAfford;
     row.classList.toggle('tab-hidden', row.dataset.kind !== activeTab);
-    if (state.cookies >= c) affordable++;
+    if (canAfford) affordable++;
+    return { row, canAfford };
   });
+  // Sort so affordable items come first (within each tab)
+  regularRowData.sort((a, b) => {
+    const aHidden = a.row.classList.contains('tab-hidden');
+    const bHidden = b.row.classList.contains('tab-hidden');
+    if (aHidden !== bHidden) return aHidden ? 1 : -1; // visible items first
+    return (b.canAfford ? 1 : 0) - (a.canAfford ? 1 : 0); // affordable items first
+  });
+  regularRowData.forEach(({ row }) => shopEl.appendChild(row));
 
-  // Tier upgrade rows
-  shopEl.querySelectorAll('.tier-item').forEach(row => {
+  // Collect and sort tier upgrade rows
+  const tierRows = Array.from(shopEl.querySelectorAll('.tier-item'));
+  const tierRowData = tierRows.map(row => {
     const t = TIER_UPGRADES.find(x => x.id === row.dataset.id);
-    if (!t) return;
+    if (!t) return { row, canAfford: false };
     const bought = state.tiersBought.includes(t.id);
     const unlocked = state.owned[t.buildingId] >= t.need;
     const canAfford = state.cookies >= t.cost;
@@ -435,7 +449,11 @@ function render() {
     if (!unlocked && !bought) { row.querySelector('[data-cost]').textContent = '🔒'; }
     if (unlocked && !bought) { row.querySelector('[data-cost]').textContent = fmt(t.cost); }
     if (canAfford && unlocked && !bought) affordable++;
+    return { row, canAfford: canAfford && unlocked && !bought };
   });
+  // Sort so affordable items come first
+  tierRowData.sort((a, b) => (b.canAfford ? 1 : 0) - (a.canAfford ? 1 : 0));
+  tierRowData.forEach(({ row }) => shopEl.appendChild(row));
 
   // Update floating shop button badge
   if (affordable > 0) {
