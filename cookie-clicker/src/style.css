@@ -575,23 +575,25 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* --- Profile tabs (Leaderboard / Achievements) --- */
-.profile-tab-btn {
+/* --- Profile tabs (Leaderboard / Achievements / User) --- */
+.profile-tab-btn, .user-tab-btn {
   flex: 1;
   border: none;
   background: transparent;
   color: #fff; opacity: 0.6;
-  padding: 0.5rem 0.75rem;
-  border-radius: 9999px;
-  font: inherit; font-weight: 700; font-size: 0.85rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 12px;
+  font: inherit; font-weight: 700; font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.15s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
 }
-.profile-tab-btn.active {
-  background: rgba(255, 255, 255, 0.15);
+.profile-tab-btn.active, .user-tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
   opacity: 1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+.profile-tab-btn span, .user-tab-btn span { font-size: 1.4rem; line-height: 1; }
 .profile-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; margin-top: 0.75rem; }
 .profile-pane.hidden { display: none; }
 
