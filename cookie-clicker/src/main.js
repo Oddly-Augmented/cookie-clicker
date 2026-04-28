@@ -319,6 +319,8 @@ const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('sh
 const quickNftBtn = $('quickNftBtn');
 const tabBtns    = document.querySelectorAll('.tab-btn');
 const orbits     = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
+const profileBtn = $('profileBtn');
+const paneNft    = $('paneNft');
 
 let activeTab = 'click'; // current shop tab
 
@@ -1020,10 +1022,12 @@ profileTabs.forEach(btn => {
     paneAchievements.classList.toggle('hidden', tab !== 'achievements');
     const panePrestige = $('panePrestige');
     if (panePrestige) panePrestige.classList.toggle('hidden', tab !== 'prestige');
-    const titles = { leaderboard: '🏆 Leaderboard', achievements: '🏅 Achievements', prestige: '🔝 Prestige' };
+    if (paneNft) paneNft.classList.toggle('hidden', tab !== 'nft');
+    const titles = { leaderboard: '🏆 Leaderboard', achievements: '🏅 Achievements', prestige: '🔝 Prestige', nft: '💎 Your NFT' };
     profileTitle.textContent = titles[tab] || '';
     if (tab === 'achievements') renderAchievements();
     if (tab === 'prestige') renderPrestige();
+    if (tab === 'nft') renderNftTab();
   });
 });
 
@@ -1036,9 +1040,44 @@ async function openProfile() {
   paneAchievements.classList.add('hidden');
   const panePrestige = $('panePrestige');
   if (panePrestige) panePrestige.classList.add('hidden');
+  if (paneNft) paneNft.classList.add('hidden');
   profileTitle.textContent = '\uD83C\uDFC6 Leaderboard';
   renderAchievements(); // keep grid fresh in the background
   await openLeaderboard();
+}
+
+function renderNftTab() {
+  if (!paneNft) return;
+  
+  if (state.ownsGoldenNFT) {
+    paneNft.innerHTML = `
+      <div class="nft-pane-content">
+        <img src="/golden-cookie.png" class="nft-display-img" alt="Golden Cookie NFT">
+        <div>
+          <h3 class="nft-status-title">Golden Cookie NFT</h3>
+          <p class="nft-status-desc">Status: <b>Verified Owner</b></p>
+          <p class="nft-status-desc" style="margin-top: 10px; font-size: 0.8rem; opacity: 0.6;">
+            Enjoy your 2x multiplier and golden bakery!
+          </p>
+        </div>
+      </div>`;
+  } else {
+    paneNft.innerHTML = `
+      <div class="nft-pane-content">
+        <div class="nft-display-img" style="background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+          <span style="font-size: 3rem;">🔒</span>
+        </div>
+        <div>
+          <h3 class="nft-status-title" style="color: #fff; opacity: 0.5;">No NFT Detected</h3>
+          <p class="nft-status-desc">Purchase the golden cookie to get x2 your score!</p>
+          <button class="nft-prompt-btn" onclick="activeTab='nft'; tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'nft')); shopDrawer.classList.remove('hidden'); requestAnimationFrame(() => shopDrawer.classList.add('open')); lbModal.classList.add('hidden'); render();">Go to Shop</button>
+        </div>
+      </div>`;
+  }
+}
+
+if (profileBtn) {
+  profileBtn.addEventListener('click', openProfile);
 }
 
 async function openLeaderboard() {
@@ -1385,6 +1424,9 @@ sdk.back.enableWebNavigation();
 try {
   const _ctx = await sdk.context;
   window._adminFid = _ctx?.user?.fid || null;
+  if (_ctx?.user?.pfpUrl && profileBtn) {
+    profileBtn.style.backgroundImage = `url('${_ctx.user.pfpUrl}')`;
+  }
   render(); // Re-render now that we know if user is admin
 } catch { window._adminFid = null; }
 

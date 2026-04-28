@@ -40,6 +40,12 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 }
 .icon-btn:active { transform: translateY(calc(-50% + 1px)); background: rgba(255, 255, 255, 0.1); }
 #lbBtn  { left: 0; }
+#profileBtn { right: 0; background-size: cover; background-position: center; border: 2px solid rgba(121, 89, 255, 0.4); }
+#profileBtn:not([style*="background-image"]) { 
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+  background-size: 60%;
+  background-repeat: no-repeat;
+}
 
 .nft-quick-btn {
   position: relative;
@@ -675,4 +681,24 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   bottom: max(1rem, env(safe-area-inset-bottom, 0)) !important;
   right: 1rem !important;
   left: auto !important;
+}
+
+/* --- NFT Pane --- */
+.nft-pane-content {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  padding: 1.5rem 1rem; text-align: center;
+}
+.nft-display-img {
+  width: 140px; height: 140px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  border: 2px solid #FFD700;
+}
+.nft-status-title { font-size: 1.2rem; font-weight: 800; color: #FFD700; margin-bottom: 0.25rem; }
+.nft-status-desc { font-size: 0.9rem; opacity: 0.8; line-height: 1.4; }
+.nft-prompt-btn {
+  margin-top: 1rem; padding: 0.6rem 1.2rem;
+  background: #7959FF; color: white;
+  border: none; border-radius: 9999px;
+  font-weight: 700; cursor: pointer;
 }

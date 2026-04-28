@@ -33,6 +33,7 @@
       <div class="title-row">
         <button id="lbBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
         <h1>FarClick</h1>
+        <button id="profileBtn" class="icon-btn profile-btn" aria-label="View Profile"></button>
       </div>
       <button id="quickNftBtn" class="icon-btn nft-quick-btn" aria-label="Buy Golden Cookie"><img src="/golden-cookie.png" alt="NFT" draggable="false"></button>
       <p class="stat"><span id="count">0</span> cookies</p>
@@ -117,6 +118,7 @@
         <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
         <button class="profile-tab-btn" data-ptab="achievements">🏅 Achieve</button>
         <button class="profile-tab-btn" data-ptab="prestige">⭐ Stats</button>
+        <button class="profile-tab-btn" data-ptab="nft">💎 NFT</button>
       </div>
 
       <!-- Leaderboard pane -->
@@ -134,6 +136,9 @@
 
       <!-- Prestige stats pane (stats only, shop is in the prestige drawer) -->
       <div id="panePrestige" class="profile-pane hidden"></div>
+
+      <!-- NFT pane -->
+      <div id="paneNft" class="profile-pane hidden"></div>
     </div>
   </div>
 
