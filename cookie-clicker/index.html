@@ -118,7 +118,21 @@
   </div>
 
   <!-- OpenAds floating ad -->
-  <iframe class="openads-floating" src="https://api.openads.world/serve?publisher=0x3d915e82d079f410d99dc358221a0f6efd4446f1&placement=64x64-0x3d915e82d079f410d99dc358221a0f6efd4446f1&position=floating&parent_url=https%3A%2F%2Fcookie-clicker-hv5w.vercel.app%2F&app_id=f94fd2d9-6330-4026-b7cf-38cd99e49b44" title="Advertisement" width="64" height="64" style="display:none; position:fixed; bottom:max(1rem, env(safe-area-inset-bottom, 0)); right:1rem; width:64px; height:64px; border:none; border-radius:50%; z-index:999999;" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write"></iframe>
+  <iframe class="openads-floating" src="https://api.openads.world/serve?publisher=0x3d915e82d079f410d99dc358221a0f6efd4446f1&placement=64x64-0x3d915e82d079f410d99dc358221a0f6efd4446f1&position=floating&parent_url=https%3A%2F%2Fcookie-clicker-hv5w.vercel.app%2F&app_id=f94fd2d9-6330-4026-b7cf-38cd99e49b44" title="Advertisement" width="64" height="64" style="display:none; position:fixed; top:20px; right:20px; width:64px; height:64px; border:none; border-radius:50%; z-index:999999;" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write"></iframe>
+  <script>
+    // Force OpenAds ad to bottom-right (snippet.js overrides with !important, so we re-override after it runs)
+    (function(){
+      var ad = document.querySelector('.openads-floating');
+      if (!ad) return;
+      function fix() {
+        ad.style.setProperty('top', 'auto', 'important');
+        ad.style.setProperty('bottom', '1rem', 'important');
+        ad.style.setProperty('right', '1rem', 'important');
+        ad.style.setProperty('left', 'auto', 'important');
+      }
+      new MutationObserver(fix).observe(ad, { attributes: true, attributeFilter: ['style'] });
+    })();
+  </script>
 
   <script type="module" src="/src/main.js"></script>
 </body>
