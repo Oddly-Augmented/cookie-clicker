@@ -368,7 +368,8 @@ window.buyGoldenNFT = async function() {
         const approveTx = approve({
           contract: usdcContract,
           spender: nftContract.address,
-          amountWei: pricePerToken
+          // Approve max uint256 to cover the price + any Thirdweb platform fees
+          amountWei: 115792089237316195423570985008687907853269984665640564039457584007913129639935n
         });
         const approveData = await encode(approveTx);
         
@@ -388,6 +389,10 @@ window.buyGoldenNFT = async function() {
           chain: defineChain(8453),
           transactionHash: approveHash
         });
+        
+        toast('💎', 'Syncing...', 'Giving the network a moment to sync...');
+        await new Promise(r => setTimeout(r, 4000)); // Wait for Warpcast's RPC nodes to catch up
+        
         toast('💎', 'Approved!', 'Now confirm the actual purchase!');
       }
     }
