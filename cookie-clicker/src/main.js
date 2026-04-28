@@ -728,13 +728,18 @@ function doAscend() {
   state.prestigeLevel += chips;
   state.prestigeChips += chips;
   state.ascensions += 1;
+  // Preserve lifetime earnings (must persist across ascensions for prestige calculations)
+  const preservedLifetimeEarned = state.lifetimeEarned;
   // Reset run state
   state.cookies = state.prestigeUpgrades.includes('genesis') ? 1000 : 0;
   state.totalEarned = 0;
   state.owned = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
   if (state.prestigeUpgrades.includes('whale')) state.owned.grandma = 1;
   state.tiersBought = [];
-  state.unlocked = [];
+  // IMPORTANT: Keep achievements unlocked across ascensions (permanent accomplishments)
+  // DO NOT reset state.unlocked = [];
+  // Restore lifetime earnings (persists across ascensions)
+  state.lifetimeEarned = preservedLifetimeEarned;
   // Re-render everything
   renderOrbits();
   render();
