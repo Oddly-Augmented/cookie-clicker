@@ -1,7 +1,8 @@
 import './style.css';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createThirdwebClient, getContract, encode } from "thirdweb";
-import { claimTo } from "thirdweb/extensions/erc1155";
+import { createThirdwebClient, getContract, encode, waitForReceipt } from "thirdweb";
+import { claimTo, getActiveClaimCondition } from "thirdweb/extensions/erc1155";
+import { allowance, approve } from "thirdweb/extensions/erc20";
 import { defineChain } from "thirdweb/chains";
 
 const thirdwebClient = createThirdwebClient({
@@ -12,6 +13,12 @@ const nftContract = getContract({
   client: thirdwebClient,
   chain: defineChain(8453),
   address: "0xB8a942d85A42b926C23B7f33A255b8DF384b15c8",
+});
+
+const usdcContract = getContract({
+  client: thirdwebClient,
+  chain: defineChain(8453),
+  address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", // Base USDC
 });
 
 // ============================================================
@@ -339,9 +346,55 @@ window.buyGoldenNFT = async function() {
     const userAddress = accounts[0];
     if (!userAddress) throw new Error('No wallet connected');
 
-    toast('💎', 'Check your Farcaster client to confirm...', 'Requesting transaction');
+    // 2. Fetch the active claim condition to get the exact required price
+    const condition = await getActiveClaimCondition({ 
+      contract: nftContract, 
+      tokenId: 0n 
+    });
+    const pricePerToken = condition.pricePerToken;
+    const currency = condition.currency;
+
+    // 3. Handle ERC20 (USDC) Approval if needed
+    if (pricePerToken > 0n && currency.toLowerCase() === usdcContract.address.toLowerCase()) {
+      toast('💎', 'Checking allowance...', 'Verifying USDC approval');
+      const currentAllowance = await allowance({
+        contract: usdcContract,
+        owner: userAddress,
+        spender: nftContract.address
+      });
+
+      if (currentAllowance < pricePerToken) {
+        toast('💎', 'Approval needed', 'Please approve USDC to continue');
+        const approveTx = approve({
+          contract: usdcContract,
+          spender: nftContract.address,
+          amountWei: pricePerToken
+        });
+        const approveData = await encode(approveTx);
+        
+        const approveHash = await sdk.wallet.ethProvider.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: userAddress,
+            to: usdcContract.address,
+            data: approveData,
+            value: '0x0'
+          }]
+        });
+
+        toast('💎', 'Approving...', 'Waiting for the blockchain to confirm approval...');
+        await waitForReceipt({
+          client: thirdwebClient,
+          chain: defineChain(8453),
+          transactionHash: approveHash
+        });
+        toast('💎', 'Approved!', 'Now confirm the actual purchase!');
+      }
+    }
+
+    toast('💎', 'Confirm Purchase', 'Requesting final purchase transaction...');
     
-    // 2. Dynamically generate the claim transaction using Thirdweb
+    // 4. Dynamically generate the claim transaction using Thirdweb
     const tx = claimTo({
       contract: nftContract,
       to: userAddress,
@@ -358,10 +411,11 @@ window.buyGoldenNFT = async function() {
       priceInWei = await tx.value;
     }
 
-    // 3. Send the transaction via the native JSON-RPC provider on Base
+    // 5. Send the claim transaction
     const result = await sdk.wallet.ethProvider.request({
       method: 'eth_sendTransaction',
       params: [{
+        from: userAddress,
         to: nftContract.address,
         value: '0x' + priceInWei.toString(16),
         data: data
