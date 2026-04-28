@@ -306,6 +306,8 @@ const fmt = n => {
 const $ = id => document.getElementById(id);
 const countEl    = $('count'),    perClickEl = $('perClick'),  perSecEl = $('perSec');
 const cookieBtn  = $('cookie'),   shopEl     = $('shop'),      fxEl      = $('fx');
+const toastsEl   = $('toasts'),   shareBtn   = $('share'),     lbBtn     = $('lbBtn');
+const addBanner  = $('addBanner'),addBtn     = $('addBtn'),    addClose  = $('addClose');
 const profileBtn = $('profileBtn');
 const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbClose   = $('lbClose'),  lbYou = $('lbYou');
 const userModal  = $('userModal'),userClose  = $('userClose');
