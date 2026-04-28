@@ -118,7 +118,6 @@
         <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
         <button class="profile-tab-btn" data-ptab="achievements">🏅 Achieve</button>
         <button class="profile-tab-btn" data-ptab="prestige">⭐ Stats</button>
-        <button class="profile-tab-btn" data-ptab="nft">💎 NFT</button>
       </div>
 
       <!-- Leaderboard pane -->
@@ -136,9 +135,29 @@
 
       <!-- Prestige stats pane (stats only, shop is in the prestige drawer) -->
       <div id="panePrestige" class="profile-pane hidden"></div>
+    </div>
+  </div>
 
-      <!-- NFT pane -->
-      <div id="paneNft" class="profile-pane hidden"></div>
+  <!-- User Profile Modal: User Stats + NFT -->
+  <div id="userModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="userTitle">👤 Profile</h2>
+        <button id="userClose" class="ghost" aria-label="Close">×</button>
+      </div>
+
+      <div class="drawer-tabs">
+        <button class="user-tab-btn active" data-utab="stats">📊 Stats</button>
+        <button class="user-tab-btn" data-utab="nft">💎 NFT</button>
+      </div>
+
+      <!-- User Stats Pane -->
+      <div id="paneUserStats" class="profile-pane">
+        <div id="userStatsContent"></div>
+      </div>
+
+      <!-- User NFT Pane -->
+      <div id="paneUserNft" class="profile-pane hidden"></div>
     </div>
   </div>
 

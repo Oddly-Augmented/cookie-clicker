@@ -306,13 +306,17 @@ const fmt = n => {
 const $ = id => document.getElementById(id);
 const countEl    = $('count'),    perClickEl = $('perClick'),  perSecEl = $('perSec');
 const cookieBtn  = $('cookie'),   shopEl     = $('shop'),      fxEl      = $('fx');
-const toastsEl   = $('toasts'),   shareBtn   = $('share'),     lbBtn     = $('lbBtn');
-const addBanner  = $('addBanner'),addBtn     = $('addBtn'),    addClose  = $('addClose');
+const profileBtn = $('profileBtn');
 const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbClose   = $('lbClose'),  lbYou = $('lbYou');
+const userModal  = $('userModal'),userClose  = $('userClose');
+const paneUserStats = $('paneUserStats'), paneUserNft = $('paneUserNft');
+const userStatsContent = $('userStatsContent');
 const profileTabs = document.querySelectorAll('.profile-tab-btn');
+const userTabs = document.querySelectorAll('.user-tab-btn');
 const paneLeaderboard = $('paneLeaderboard');
 const paneAchievements = $('paneAchievements');
 const profileTitle = $('profileTitle');
+const userTitle = $('userTitle');
 const achList    = $('achList'),  achProgress = $('achProgress');
 const bonusBar   = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
 const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('shopClose'), shopBadge = $('shopAffordable');
@@ -1022,12 +1026,21 @@ profileTabs.forEach(btn => {
     paneAchievements.classList.toggle('hidden', tab !== 'achievements');
     const panePrestige = $('panePrestige');
     if (panePrestige) panePrestige.classList.toggle('hidden', tab !== 'prestige');
-    if (paneNft) paneNft.classList.toggle('hidden', tab !== 'nft');
-    const titles = { leaderboard: '🏆 Leaderboard', achievements: '🏅 Achievements', prestige: '🔝 Prestige', nft: '💎 Your NFT' };
+    const titles = { leaderboard: '🏆 Leaderboard', achievements: '🏅 Achievements', prestige: '🔝 Prestige' };
     profileTitle.textContent = titles[tab] || '';
     if (tab === 'achievements') renderAchievements();
     if (tab === 'prestige') renderPrestige();
-    if (tab === 'nft') renderNftTab();
+  });
+});
+
+userTabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.utab;
+    userTabs.forEach(b => b.classList.toggle('active', b === btn));
+    paneUserStats.classList.toggle('hidden', tab !== 'stats');
+    paneUserNft.classList.toggle('hidden', tab !== 'nft');
+    if (tab === 'stats') renderUserStats();
+    if (tab === 'nft') renderUserNft();
   });
 });
 
@@ -1040,17 +1053,57 @@ async function openProfile() {
   paneAchievements.classList.add('hidden');
   const panePrestige = $('panePrestige');
   if (panePrestige) panePrestige.classList.add('hidden');
-  if (paneNft) paneNft.classList.add('hidden');
   profileTitle.textContent = '\uD83C\uDFC6 Leaderboard';
   renderAchievements(); // keep grid fresh in the background
   await openLeaderboard();
 }
 
-function renderNftTab() {
-  if (!paneNft) return;
+function openUserModal() {
+  haptic('medium');
+  userModal.classList.remove('hidden');
+  userTabs[0].click(); // default to stats
+  renderUserStats();
+}
+
+function renderUserStats() {
+  if (!userStatsContent) return;
+  const ctx = window._cachedContext;
+  const name = ctx?.user?.displayName || ctx?.user?.username || 'Brave Baker';
+  const fid = ctx?.user?.fid || '???';
+  
+  userStatsContent.innerHTML = `
+    <div class="user-info-header">
+      <div class="user-info-name">${name}</div>
+      <div class="user-info-fid">FID: ${fid}</div>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Total Cookies</span>
+      <span class="user-stat-value">${fmt(state.cookies)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Lifetime Earned</span>
+      <span class="user-stat-value">${fmt(state.lifetimeEarned)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Total Clicks</span>
+      <span class="user-stat-value">${fmt(state.totalClicks)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Prestige Level</span>
+      <span class="user-stat-value">${state.prestigeLevel}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Ascensions</span>
+      <span class="user-stat-value">${state.ascensions}</span>
+    </div>
+  `;
+}
+
+function renderUserNft() {
+  if (!paneUserNft) return;
   
   if (state.ownsGoldenNFT) {
-    paneNft.innerHTML = `
+    paneUserNft.innerHTML = `
       <div class="nft-pane-content">
         <img src="/golden-cookie.png" class="nft-display-img" alt="Golden Cookie NFT">
         <div>
@@ -1062,7 +1115,7 @@ function renderNftTab() {
         </div>
       </div>`;
   } else {
-    paneNft.innerHTML = `
+    paneUserNft.innerHTML = `
       <div class="nft-pane-content">
         <div class="nft-display-img" style="background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; opacity: 0.3;">
           <span style="font-size: 3rem;">🔒</span>
@@ -1070,15 +1123,19 @@ function renderNftTab() {
         <div>
           <h3 class="nft-status-title" style="color: #fff; opacity: 0.5;">No NFT Detected</h3>
           <p class="nft-status-desc">Purchase the golden cookie to get x2 your score!</p>
-          <button class="nft-prompt-btn" onclick="activeTab='nft'; tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'nft')); shopDrawer.classList.remove('hidden'); requestAnimationFrame(() => shopDrawer.classList.add('open')); lbModal.classList.add('hidden'); render();">Go to Shop</button>
+          <button class="nft-prompt-btn" onclick="activeTab='nft'; tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'nft')); shopDrawer.classList.remove('hidden'); requestAnimationFrame(() => shopDrawer.classList.add('open')); document.getElementById('userModal').classList.add('hidden'); render();">Go to Shop</button>
         </div>
       </div>`;
   }
 }
 
 if (profileBtn) {
-  profileBtn.addEventListener('click', openProfile);
+  profileBtn.addEventListener('click', openUserModal);
 }
+if (userClose) {
+  userClose.addEventListener('click', () => userModal.classList.add('hidden'));
+}
+userModal?.addEventListener('click', e => { if (e.target === userModal) userModal.classList.add('hidden'); });
 
 async function openLeaderboard() {
   lbList.innerHTML = '<p class="lb-msg">Loading...</p>';
@@ -1423,6 +1480,7 @@ sdk.back.enableWebNavigation();
 // Cache FID for admin checks in synchronous render()
 try {
   const _ctx = await sdk.context;
+  window._cachedContext = _ctx;
   window._adminFid = _ctx?.user?.fid || null;
   if (_ctx?.user?.pfpUrl && profileBtn) {
     profileBtn.style.backgroundImage = `url('${_ctx.user.pfpUrl}')`;
