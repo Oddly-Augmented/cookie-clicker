@@ -1031,21 +1031,65 @@ if (followClose && followModal) {
 if (followBtn && followModal) {
   followBtn.addEventListener('click', async () => {
     try {
+      const ctx = await sdk.context;
+      const viewerFid = ctx?.user?.fid;
+      
+      if (!viewerFid) {
+        toast('⚠️', 'Error', 'Could not detect your Farcaster ID to verify follow.');
+        return;
+      }
+
+      // Open the profile natively
       await sdk.actions.viewProfile({ fid: 1014465 });
-      if (!state.followsOddly) {
+
+      // Change button state to indicate we are verifying
+      followBtn.disabled = true;
+      followBtn.textContent = 'Verifying follow...';
+      followBtn.style.opacity = '0.7';
+
+      // Poll the Neynar backend to see if they actually followed
+      // Checks every 3 seconds for up to 15 seconds
+      let verified = false;
+      for (let i = 0; i < 5; i++) {
+        await new Promise(r => setTimeout(r, 3000));
+        
+        try {
+          const res = await fetch(`/api/verify-follow?viewer_fid=${viewerFid}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.following) {
+              verified = true;
+              break;
+            }
+          }
+        } catch (e) {
+          console.error("Verification ping failed", e);
+        }
+      }
+
+      if (verified && !state.followsOddly) {
         state.followsOddly = true;
         state.cookies += 5000;
         state.totalEarned += 5000;
         state.lifetimeEarned += 5000;
         saveState();
         render();
-        toast('🎉', 'Thanks for following!', '+5,000 Cookies added to your bakery!');
+        toast('🎉', 'Follow Verified!', '+5,000 Cookies added to your bakery!');
         autoSubmitScore();
+        followModal.classList.add('hidden');
+      } else if (!verified) {
+        toast('⏳', 'Not detected yet', "We didn't detect a follow. Sometimes it takes a moment, try again!");
       }
+
     } catch (err) {
       console.error(err);
+      toast('⚠️', 'Error', 'Something went wrong while verifying.');
+    } finally {
+      // Reset button state
+      followBtn.disabled = false;
+      followBtn.textContent = 'Follow @oddlyaugmented.eth';
+      followBtn.style.opacity = '1';
     }
-    followModal.classList.add('hidden');
   });
 }
 
