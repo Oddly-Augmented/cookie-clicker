@@ -602,8 +602,10 @@ function renderAchievements() {
     return `
       <div class="ach-card ${unlocked ? 'unlocked' : 'locked'} ${clickable ? 'clickable' : ''}" ${clickable ? 'onclick="followCreator()"' : ''}>
         <span class="ach-emoji">${unlocked ? a.emoji : '🔒'}</span>
-        <span class="ach-label">${a.label}</span>
-        <span class="ach-need">${needText}</span>
+        <div class="ach-info">
+          <span class="ach-label">${a.label}</span>
+          <span class="ach-need">${needText}</span>
+        </div>
       </div>`;
   }).join('');
 }
