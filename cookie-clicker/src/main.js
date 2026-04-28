@@ -1,7 +1,7 @@
 import './style.css';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { createThirdwebClient, getContract, encode, waitForReceipt } from "thirdweb";
-import { claimTo, getActiveClaimCondition } from "thirdweb/extensions/erc1155";
+import { claimTo, getActiveClaimCondition, totalSupply } from "thirdweb/extensions/erc1155";
 import { allowance, approve } from "thirdweb/extensions/erc20";
 import { defineChain } from "thirdweb/chains";
 
@@ -306,11 +306,28 @@ nftBtn.innerHTML = `
   <span class="emoji">💎</span>
   <span class="info">
     <span class="name">Golden Cookie NFT</span>
-    <span class="effect">2× Multiplier & Golden visual! Max Supply: 100</span>
+    <span class="effect">2× Multiplier & Golden visual! <span id="nftSupplyText">Loading supply...</span></span>
   </span>
   <span class="cost" id="nftCost" style="color:#4caf50;">$2</span>`;
 nftBtn.addEventListener('click', () => buyGoldenNFT());
 shopEl.appendChild(nftBtn);
+
+// Fetch live NFT supply from blockchain
+(async function updateNftSupply() {
+  try {
+    const [claimed, condition] = await Promise.all([
+      totalSupply({ contract: nftContract, id: 0n }),
+      getActiveClaimCondition({ contract: nftContract, tokenId: 0n })
+    ]);
+    const max = condition.maxClaimableSupply || 100n;
+    const el = document.getElementById('nftSupplyText');
+    if (el) el.textContent = `${claimed}/${max} claimed`;
+  } catch (e) {
+    console.error('Supply fetch failed:', e);
+    const el = document.getElementById('nftSupplyText');
+    if (el) el.textContent = 'Max Supply: 100';
+  }
+})();
 
 function buyTier(t) {
   if (state.tiersBought.includes(t.id)) return;
@@ -439,6 +456,12 @@ window.buyGoldenNFT = async function() {
       toast('💎', 'Golden NFT Acquired!', '2x multiplier active and your cookie is golden!');
       haptic('heavy');
       render();
+      // Refresh supply count
+      try {
+        const newClaimed = await totalSupply({ contract: nftContract, id: 0n });
+        const el = document.getElementById('nftSupplyText');
+        if (el) el.textContent = `${newClaimed}/100 claimed`;
+      } catch {}
     }
   } catch (err) {
     console.error('NFT Purchase failed:', err);
