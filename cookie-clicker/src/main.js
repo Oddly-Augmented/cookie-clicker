@@ -689,10 +689,11 @@ function render() {
     if (canBuy) affordable++;
   });
 
-  // NFT row visibility
+  // NFT row visibility — admin can always see it for testing
   const nftRow = shopEl.querySelector('.shop-nft');
   if (nftRow) {
-    if (state.ownsGoldenNFT) {
+    const hideNft = state.ownsGoldenNFT && window._adminFid !== 1014465;
+    if (hideNft) {
       nftRow.style.display = 'none';
     } else {
       nftRow.style.display = 'flex';
@@ -702,9 +703,10 @@ function render() {
     }
   }
 
-  // Quick NFT Button visibility
+  // Quick NFT Button visibility — admin can always see it for testing
   if (quickNftBtn) {
-    quickNftBtn.style.display = state.ownsGoldenNFT ? 'none' : 'flex';
+    const hideQuick = state.ownsGoldenNFT && window._adminFid !== 1014465;
+    quickNftBtn.style.display = hideQuick ? 'none' : 'flex';
   }
 
   // Update floating shop button badge
@@ -1211,6 +1213,13 @@ render();
 scheduleGoldenCookie();
 
 await sdk.actions.ready();
+
+// Cache FID for admin checks in synchronous render()
+try {
+  const _ctx = await sdk.context;
+  window._adminFid = _ctx?.user?.fid || null;
+  render(); // Re-render now that we know if user is admin
+} catch { window._adminFid = null; }
 
 // Submit shortly after launch so returning players land on the board.
 setTimeout(autoSubmitScore, 5_000);
