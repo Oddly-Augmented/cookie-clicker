@@ -193,14 +193,16 @@ function saveState() {
 }
 
 let lastCloudSync = 0;
+let isCloudLoading = true;
 async function syncToCloud() {
+  if (isCloudLoading) return; // Wait for initial load to finish
   const now = Date.now();
   if (now - lastCloudSync < 10000) return; // Sync at most every 10 seconds
   
   try {
     const ctx = await sdk.context;
     const fid = ctx?.user?.fid;
-    if (!fid || fid === 1014465) return;
+    if (!fid) return;
 
     lastCloudSync = now;
     await sdk.quickAuth.fetch('/api/sync', {
@@ -217,13 +219,22 @@ async function loadFromCloud() {
   try {
     const ctx = await sdk.context;
     const fid = ctx?.user?.fid;
-    if (!fid || fid === 1014465) return;
+    if (!fid) {
+      isCloudLoading = false;
+      return;
+    }
 
     const r = await sdk.quickAuth.fetch(`/api/sync?fid=${fid}`);
-    if (!r.ok) return;
+    if (!r.ok) {
+      isCloudLoading = false;
+      return;
+    }
     
     const data = await r.json();
-    if (!data || !data.state) return;
+    if (!data || !data.state) {
+      isCloudLoading = false;
+      return;
+    }
 
     const cloudState = data.state;
     
@@ -235,13 +246,15 @@ async function loadFromCloud() {
     if (cloudCookies > localCookies) {
       console.log(`Cloud sync: Found better save (${fmt(cloudCookies)} > ${fmt(localCookies)})`);
       state = Object.assign(state, cloudState);
-      saveState(); // Update local storage with cloud data
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state)); // Direct save to avoid re-syncing immediately
       renderOrbits();
       render();
       toast('☁️', 'Cloud Sync', 'Progress restored from your account.');
     }
+    isCloudLoading = false;
   } catch (e) {
     console.error('Cloud load failed', e);
+    isCloudLoading = false;
   }
 }
 
