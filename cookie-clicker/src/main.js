@@ -410,35 +410,24 @@ function render() {
   perSecEl.textContent   = fmt(perSec());
 
   let affordable = 0;
-
-  // Collect and sort regular upgrade rows
-  const regularRows = Array.from(shopEl.querySelectorAll('.shop-item:not(.tier-item)'));
-  const regularRowData = regularRows.map(row => {
+  shopEl.querySelectorAll('.shop-item:not(.tier-item)').forEach(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
-    if (!u) return { row, canAfford: false };
+    if (!u) return;
     const c = cost(u);
     row.querySelector('[data-cost]').textContent  = fmt(c);
     row.querySelector('[data-count]').textContent = state.owned[u.id] ? `×${state.owned[u.id]}` : '';
     const canAfford = state.cookies >= c;
     row.disabled = !canAfford;
     row.classList.toggle('tab-hidden', row.dataset.kind !== activeTab);
+    // Use CSS order to sort: affordable items get lower order values (appear first)
+    row.style.order = row.classList.contains('tab-hidden') ? 1000 : (canAfford ? 0 : 1);
     if (canAfford) affordable++;
-    return { row, canAfford };
   });
-  // Sort so affordable items come first (within each tab)
-  regularRowData.sort((a, b) => {
-    const aHidden = a.row.classList.contains('tab-hidden');
-    const bHidden = b.row.classList.contains('tab-hidden');
-    if (aHidden !== bHidden) return aHidden ? 1 : -1; // visible items first
-    return (b.canAfford ? 1 : 0) - (a.canAfford ? 1 : 0); // affordable items first
-  });
-  regularRowData.forEach(({ row }) => shopEl.appendChild(row));
 
-  // Collect and sort tier upgrade rows
-  const tierRows = Array.from(shopEl.querySelectorAll('.tier-item'));
-  const tierRowData = tierRows.map(row => {
+  // Tier upgrade rows
+  shopEl.querySelectorAll('.tier-item').forEach(row => {
     const t = TIER_UPGRADES.find(x => x.id === row.dataset.id);
-    if (!t) return { row, canAfford: false };
+    if (!t) return;
     const bought = state.tiersBought.includes(t.id);
     const unlocked = state.owned[t.buildingId] >= t.need;
     const canAfford = state.cookies >= t.cost;
@@ -448,12 +437,11 @@ function render() {
     if (bought) { row.querySelector('[data-cost]').textContent = '✔'; }
     if (!unlocked && !bought) { row.querySelector('[data-cost]').textContent = '🔒'; }
     if (unlocked && !bought) { row.querySelector('[data-cost]').textContent = fmt(t.cost); }
-    if (canAfford && unlocked && !bought) affordable++;
-    return { row, canAfford: canAfford && unlocked && !bought };
+    // Use CSS order to sort: affordable items get lower order values (appear first)
+    const canBuy = canAfford && unlocked && !bought;
+    row.style.order = canBuy ? 0 : 1;
+    if (canBuy) affordable++;
   });
-  // Sort so affordable items come first
-  tierRowData.sort((a, b) => (b.canAfford ? 1 : 0) - (a.canAfford ? 1 : 0));
-  tierRowData.forEach(({ row }) => shopEl.appendChild(row));
 
   // Update floating shop button badge
   if (affordable > 0) {
