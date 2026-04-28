@@ -87,6 +87,8 @@ const ACHIEVEMENTS = [
   { id: 'p3',    need: 10,  label: 'Ascension Master',   emoji: '🌠', kind: 'ascensions' },
   // Special
   { id: 'sg',    need: 1_000_000, label: '1M CpS',        emoji: '⚡', kind: 'cps' },
+  // Ad support
+  { id: 'ad1',   need: 1,         label: 'Ad Supporter',  emoji: '📺', kind: 'adViews' },
 ];
 
 // ============================================================
@@ -111,7 +113,11 @@ const defaultState = () => ({
   lastPlayed: Date.now(),
   lastDailyClaim: 0,
   promptedAdd: false,
-  lastSubmittedScore: 0
+  lastSubmittedScore: 0,
+  // Ad boost
+  adBoostEnd: 0,
+  lastAdBoost: 0,
+  adViews: 0
 });
 
 // Migrate from v1 save
@@ -139,6 +145,9 @@ function loadState() {
       saved.lifetimeEarned = saved.lifetimeEarned ?? saved.totalEarned ?? 0;
       saved.totalClicks = saved.totalClicks ?? 0;
       saved.lastSubmittedScore = saved.lastSubmittedScore ?? 0;
+      saved.adBoostEnd = saved.adBoostEnd ?? 0;
+      saved.lastAdBoost = saved.lastAdBoost ?? 0;
+      saved.adViews = saved.adViews ?? 0;
       return saved;
     }
     const migrated = migrateV1();
@@ -172,8 +181,11 @@ const protocolMult = () => state.prestigeUpgrades.includes('protocol') ? 1.5 : 1
 const wagmiMult    = () => state.prestigeUpgrades.includes('wagmi') ? 2 : 1;
 const globalMult   = () => milkMult() * prestigeMult() * protocolMult() * wagmiMult();
 
-const perClick = () => (1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0)) * globalMult();
-const perSec   = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult();
+const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
+const adBoostMult   = () => adBoostActive() ? 1.5 : 1;
+
+const perClick = () => (1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0)) * globalMult() * adBoostMult();
+const perSec   = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult() * adBoostMult();
 
 // Prestige calculation
 const calcPrestigeLevel = () => Math.floor(Math.sqrt(state.lifetimeEarned / 1e9));
@@ -393,6 +405,60 @@ function activateBonus() {
 }
 
 // ============================================================
+// Ad Boost — 1.5× CpS for 5 min, 3hr cooldown
+// ============================================================
+const AD_BOOST_DURATION = 5 * 60 * 1000;   // 5 minutes
+const AD_BOOST_COOLDOWN = 3 * 60 * 60 * 1000; // 3 hours
+
+function activateAdBoost() {
+  const now = Date.now();
+  // Check cooldown
+  if (now - (state.lastAdBoost || 0) < AD_BOOST_COOLDOWN) {
+    const remaining = AD_BOOST_COOLDOWN - (now - state.lastAdBoost);
+    const mins = Math.ceil(remaining / 60000);
+    toast('⏳', 'Boost on cooldown', `Try again in ${mins} min`);
+    return;
+  }
+  state.adViews = (state.adViews || 0) + 1;
+  state.lastAdBoost = now;
+  state.adBoostEnd = now + AD_BOOST_DURATION;
+  saveState();
+  toast('📺', 'Ad Boost Active!', '1.5× all production for 5 minutes!');
+  haptic('medium');
+  checkAchievements();
+
+  // Show bonus bar for ad boost
+  clearInterval(bonusBarInterval);
+  bonusBar.classList.add('active');
+  bonusProgress.style.width = '100%';
+  bonusBarInterval = setInterval(() => {
+    const rem = Math.max(0, state.adBoostEnd - Date.now());
+    bonusProgress.style.width = `${(rem / AD_BOOST_DURATION) * 100}%`;
+    bonusLabel.textContent = `📺 1.5× AD BOOST — ${Math.ceil(rem / 1000)}s`;
+    if (rem <= 0) {
+      clearInterval(bonusBarInterval);
+      bonusBar.classList.remove('active');
+      toast('⏰', 'Ad Boost ended', 'Thanks for supporting!');
+    }
+  }, 200);
+}
+
+// Detect ad iframe click via focus/blur
+(function detectAdClick() {
+  const adFrame = document.querySelector('.openads-floating');
+  if (!adFrame) return;
+  window.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (document.activeElement === adFrame || document.activeElement?.tagName === 'IFRAME') {
+        activateAdBoost();
+        // Refocus window so user can keep clicking
+        window.focus();
+      }
+    }, 100);
+  });
+})();
+
+// ============================================================
 // Click cookie
 // ============================================================
 cookieBtn.addEventListener('click', () => {
@@ -493,6 +559,7 @@ function checkAchievements() {
     if (a.kind === 'tiers')      val = state.tiersBought.length;
     if (a.kind === 'ascensions') val = state.ascensions;
     if (a.kind === 'cps')        val = perSec();
+    if (a.kind === 'adViews')    val = state.adViews || 0;
     if (val >= a.need) {
       state.unlocked.push(a.id);
       toast(a.emoji, 'Achievement: ' + a.label);
