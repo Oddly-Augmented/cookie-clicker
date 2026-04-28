@@ -223,6 +223,7 @@ const profileTitle = $('profileTitle');
 const achList    = $('achList'),  achProgress = $('achProgress');
 const bonusBar   = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
 const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('shopClose'), shopBadge = $('shopAffordable');
+const quickNftBtn = $('quickNftBtn');
 const tabBtns    = document.querySelectorAll('.tab-btn');
 const orbits     = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
 
@@ -400,16 +401,30 @@ tabBtns.forEach(btn => {
   });
 });
 
+if (quickNftBtn) {
+  quickNftBtn.addEventListener('click', () => {
+    shopDrawer.classList.remove('hidden');
+    requestAnimationFrame(() => shopDrawer.classList.add('open'));
+    document.querySelector('.openads-floating')?.style.setProperty('display', 'none', 'important');
+    activeTab = 'nft';
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'nft'));
+    haptic('light');
+    render();
+  });
+}
+
 // Drawer open/close
 shopBtn.addEventListener('click', () => {
   shopDrawer.classList.remove('hidden');
   requestAnimationFrame(() => shopDrawer.classList.add('open'));
+  document.querySelector('.openads-floating')?.style.setProperty('display', 'none', 'important');
   haptic('light');
 });
 shopClose.addEventListener('click', closeShop);
 shopDrawer.addEventListener('click', e => { if (e.target === shopDrawer) closeShop(); });
 function closeShop() {
   shopDrawer.classList.remove('open');
+  document.querySelector('.openads-floating')?.style.setProperty('display', 'block', 'important');
   setTimeout(() => shopDrawer.classList.add('hidden'), 250);
 }
 
@@ -623,15 +638,19 @@ function render() {
   // NFT row visibility
   const nftRow = shopEl.querySelector('.shop-nft');
   if (nftRow) {
-    nftRow.classList.toggle('tab-hidden', activeTab !== 'nft');
     if (state.ownsGoldenNFT) {
-      nftRow.disabled = true;
-      nftRow.querySelector('#nftCost').textContent = '✔ Owned';
-      nftRow.style.order = 10;
+      nftRow.style.display = 'none';
     } else {
+      nftRow.style.display = 'flex';
+      nftRow.classList.toggle('tab-hidden', activeTab !== 'nft');
       nftRow.disabled = false;
       nftRow.style.order = 0;
     }
+  }
+
+  // Quick NFT Button visibility
+  if (quickNftBtn) {
+    quickNftBtn.style.display = state.ownsGoldenNFT ? 'none' : 'flex';
   }
 
   // Update floating shop button badge
