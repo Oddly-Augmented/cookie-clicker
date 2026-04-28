@@ -390,6 +390,7 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 .lb-row:last-child { border-bottom: none; }
 .lb-rank  { font-size: 1.1rem; width: 2.2rem; text-align: center; font-weight: 700; color: #7959FF; }
 .lb-name  { flex: 1; font-weight: 600; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-prestige { font-size: 0.85rem; color: #b388ff; font-weight: 600; min-width: 3rem; text-align: right; }
 .lb-score { font-weight: 800; color: #fff; }
 .lb-msg   { padding: 1.5rem 0; text-align: center; opacity: 0.6; font-size: 0.9rem; }
 

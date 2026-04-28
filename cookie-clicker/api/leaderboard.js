@@ -1,7 +1,7 @@
 // ============================================================
 // Leaderboard API
 // ------------------------------------------------------------
-// GET  /api/leaderboard       → top 10 scores
+// GET  /api/leaderboard       → top 100 scores with prestige
 // POST /api/leaderboard       → upsert score (only if higher)
 // ============================================================
 
@@ -16,14 +16,14 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 
-  // ---- GET: top 10 scores ----
+  // ---- GET: top 100 scores with prestige ----
   if (req.method === 'GET') {
     try {
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('fid, username, score')
+        .select('fid, username, score, prestige_level')
         .order('score', { ascending: false })
-        .limit(10);
+        .limit(100);
 
       if (error) {
         console.error('Leaderboard SELECT error:', error);
@@ -36,10 +36,10 @@ export default async function handler(req, res) {
     }
   }
 
-  // ---- POST: submit score ----
+  // ---- POST: submit score with prestige ----
   if (req.method === 'POST') {
     try {
-      const { fid, username, score } = req.body || {};
+      const { fid, username, score, prestige_level } = req.body || {};
       if (!fid || typeof score !== 'number') {
         return res.status(400).json({ error: 'fid and numeric score required' });
       }
@@ -66,6 +66,7 @@ export default async function handler(req, res) {
           fid,
           username: (username || 'Anonymous').slice(0, 32),
           score,
+          prestige_level: prestige_level || 0,
           updated_at: new Date().toISOString()
         }, { onConflict: 'fid' });
 
@@ -82,3 +83,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: 'Method not allowed' });
 }
+

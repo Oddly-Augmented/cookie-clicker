@@ -556,7 +556,7 @@ async function autoSubmitScore() {
     const r = await fetch('/api/leaderboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fid, username, score })
+      body: JSON.stringify({ fid, username, score, prestige_level: state.prestigeLevel })
     });
     if (r.ok) {
       state.lastSubmittedScore = score;
@@ -619,6 +619,7 @@ async function openLeaderboard() {
         <div class="lb-row">
           <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
           <span class="lb-name">${escapeHtml(row.username)}</span>
+          <span class="lb-prestige">${row.prestige_level ? `🔝 ${row.prestige_level}` : ''}</span>
           <span class="lb-score">${fmt(row.score)}</span>
         </div>`).join('');
     }
@@ -629,9 +630,9 @@ async function openLeaderboard() {
       const me = data.find(r => r.fid === ctx.user.fid);
       if (me) {
         const rank = data.indexOf(me) + 1;
-        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} cookies`;
+        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} cookies (Prestige: ${me.prestige_level || 0})`;
       } else {
-        lbYou.textContent = `Your score: ${fmt(state.totalEarned)} (keep baking to crack the top 10)`;
+        lbYou.textContent = `Your score: ${fmt(state.totalEarned)} (keep baking to crack the top 100)`;
       }
     } else {
       lbYou.textContent = 'Open in Farcaster to appear on the leaderboard.';
