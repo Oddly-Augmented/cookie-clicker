@@ -391,10 +391,8 @@ window.buyGoldenNFT = async function() {
           transactionHash: approveHash
         });
         
-        toast('💎', 'Syncing...', 'Giving the network a moment to sync...');
-        await new Promise(r => setTimeout(r, 4000)); // Wait for Warpcast's RPC nodes to catch up
-        
-        toast('💎', 'Approved!', 'Now confirm the actual purchase!');
+        toast('✅', 'USDC Approved!', 'The network is syncing. Tap Buy again in a few seconds to claim your NFT!');
+        return; // Stop the flow here to let Warpcast's simulation nodes catch up before the user clicks Buy again
       }
     }
 
