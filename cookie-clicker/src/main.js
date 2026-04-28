@@ -1037,8 +1037,8 @@ if (followBtn && followModal) {
         return;
       }
 
-      // Open the profile natively
-      await sdk.actions.viewProfile({ fid: 1014465 });
+      // Open the profile via URL instead of native sheet as requested
+      await sdk.actions.openUrl('https://farcaster.xyz/oddlyaugmented.eth');
 
       // Change button state to indicate we are verifying
       followBtn.disabled = true;
