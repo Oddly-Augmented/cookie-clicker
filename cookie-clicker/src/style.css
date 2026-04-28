@@ -260,29 +260,28 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   bottom: max(1rem, env(safe-area-inset-bottom, 0));
   left: 50%;
   transform: translateX(-50%);
-  display: flex; align-items: center; justify-content: center;
-  width: 2.6rem; height: 2.6rem;
-  padding: 0;
+  display: flex; align-items: center; gap: 0.4rem;
+  height: 2.6rem;
+  padding: 0 1.2rem;
   border: none; border-radius: 9999px;
   background: #7959FF;
   color: white;
-  font-size: 1.1rem;
+  font: inherit; font-weight: 800; font-size: 0.9rem;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(121, 89, 255, 0.4), 0 3px 0 #5E41D1;
   z-index: 70;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .shop-fab:active { transform: translateX(-50%) translateY(2px); box-shadow: 0 3px 10px rgba(121, 89, 255, 0.4), 0 1px 0 #5E41D1; }
-.shop-fab-emoji { font-size: 1.1rem; line-height: 1; }
-.shop-fab-label { display: none; }
+.shop-fab-emoji { font-size: 1rem; line-height: 1; }
+.shop-fab-label { letter-spacing: 0.5px; }
 .shop-fab-badge {
-  position: absolute; top: -4px; right: -4px;
   background: white; color: #7959FF;
-  font-size: 0.6rem; font-weight: 800;
-  min-width: 1.1rem; height: 1.1rem;
+  font-size: 0.65rem; font-weight: 800;
+  min-width: 1.15rem; height: 1.15rem;
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: 9999px;
-  padding: 0 0.2rem;
+  padding: 0 0.25rem;
 }
 .shop-fab-badge.hidden { display: none; }
 
