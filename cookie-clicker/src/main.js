@@ -63,15 +63,15 @@ const TIER_UPGRADES = UPGRADES.flatMap(u =>
 
 // --- Prestige upgrades (persist across resets) ---
 const PRESTIGE_UPGRADES = [
-  { id: 'genesis',  name: 'Genesis Block',    emoji: '🧱', cost: 1,   desc: 'Start each run with 1,000 cookies' },
-  { id: 'diamond',  name: 'Diamond Hands',    emoji: '💎', cost: 3,   desc: '+25% offline earnings' },
-  { id: 'moon',     name: 'Moon Math',        emoji: '🌙', cost: 5,   desc: 'Golden cookies 2× more often' },
-  { id: 'whale',    name: 'Whale Wallet',     emoji: '🐋', cost: 10,  desc: 'Start with 1 free Click Farm' },
-  { id: 'protocol', name: 'Protocol Upgrade', emoji: '⬆️', cost: 25,  desc: '+50% all building output' },
-  { id: 'lucky',    name: 'Lucky Drops',      emoji: '🍀', cost: 15,  desc: 'Golden cookie bonus is 10×' },
-  { id: 'fomo',     name: 'FOMO Shield',      emoji: '🛡️', cost: 20,  desc: 'Daily bonus is 3× larger' },
-  { id: 'recursive',name: 'Recursive AGI',    emoji: '🔄', cost: 50,  desc: 'Prestige chips give +2% CpS' },
-  { id: 'wagmi',    name: 'WAGMI',            emoji: '🚀', cost: 100, desc: 'All CpS ×2' },
+  { id: 'genesis',  name: 'Genesis Block',    emoji: '🧱', cost: 1,   desc: 'Start each run with 10,000 cookies' },
+  { id: 'diamond',  name: 'Diamond Hands',    emoji: '💎', cost: 2,   desc: '+50% offline earnings' },
+  { id: 'moon',     name: 'Moon Math',        emoji: '🌙', cost: 3,   desc: 'Golden cookies appear 3× more often' },
+  { id: 'whale',    name: 'Whale Wallet',     emoji: '🐋', cost: 5,   desc: 'Start with 5 free Click Farms' },
+  { id: 'lucky',    name: 'Lucky Drops',      emoji: '🍀', cost: 8,   desc: 'Golden cookie bonus is 25×' },
+  { id: 'fomo',     name: 'FOMO Shield',      emoji: '🛡️', cost: 12,  desc: 'Daily bonus is 5× larger' },
+  { id: 'protocol', name: 'Protocol Upgrade', emoji: '⬆️', cost: 15,  desc: '+100% all building output' },
+  { id: 'recursive',name: 'Recursive AGI',    emoji: '🔄', cost: 25,  desc: 'Prestige chips give +5% CpS each' },
+  { id: 'wagmi',    name: 'WAGMI',            emoji: '🚀', cost: 50,  desc: 'All CpS ×3' },
 ];
 
 const ACHIEVEMENTS = [
@@ -102,9 +102,9 @@ const ACHIEVEMENTS = [
   { id: 't2',    need: 10,  label: '10 Upgrades',        emoji: '🔧', kind: 'tiers' },
   { id: 't3',    need: 25,  label: '25 Upgrades',        emoji: '⚙️', kind: 'tiers' },
   // Prestige milestones
-  { id: 'p1',    need: 1,   label: 'First Ascension',    emoji: '🔝', kind: 'ascensions' },
-  { id: 'p2',    need: 3,   label: 'Triple Ascension',   emoji: '♾️', kind: 'ascensions' },
-  { id: 'p3',    need: 10,  label: 'Ascension Master',   emoji: '🌠', kind: 'ascensions' },
+  { id: 'p1',    need: 1,   label: 'First Prestige',     emoji: '🔝', kind: 'ascensions' },
+  { id: 'p2',    need: 3,   label: 'Triple Prestige',    emoji: '♾️', kind: 'ascensions' },
+  { id: 'p3',    need: 10,  label: 'Prestige Master',    emoji: '🌠', kind: 'ascensions' },
   // Special
   { id: 'sg',    need: 1_000_000, label: '1M CpS',        emoji: '⚡', kind: 'cps' },
   // Ad support
@@ -200,11 +200,11 @@ const tierMult = uid => Math.pow(2, TIER_UPGRADES.filter(t => t.buildingId === u
 // Global multipliers
 const milkMult     = () => 1 + state.unlocked.length * 0.01;
 const prestigeMult = () => {
-  const rate = state.prestigeUpgrades.includes('recursive') ? 2 : 1;
+  const rate = state.prestigeUpgrades.includes('recursive') ? 5 : 1;
   return 1 + state.prestigeLevel * rate / 100;
 };
-const protocolMult = () => state.prestigeUpgrades.includes('protocol') ? 1.5 : 1;
-const wagmiMult    = () => state.prestigeUpgrades.includes('wagmi') ? 2 : 1;
+const protocolMult = () => state.prestigeUpgrades.includes('protocol') ? 2 : 1;
+const wagmiMult    = () => state.prestigeUpgrades.includes('wagmi') ? 3 : 1;
 const nftMult      = () => state.ownsGoldenNFT ? 2 : 1;
 const globalMult   = () => milkMult() * prestigeMult() * protocolMult() * wagmiMult() * nftMult();
 
@@ -732,6 +732,13 @@ function render() {
     quickNftBtn.style.display = hideQuick ? 'none' : 'flex';
   }
 
+  // Prestige button visibility — show when user has prestiged OR can prestige
+  const pBtn = $('prestigeBtn');
+  if (pBtn) {
+    const showPrestige = (state.ascensions || 0) > 0 || newChipsOnAscend() >= 1;
+    pBtn.classList.toggle('hidden', !showPrestige);
+  }
+
   // Update floating shop button badge
   if (affordable > 0) {
     shopBadge.classList.remove('hidden');
@@ -1130,8 +1137,10 @@ setTimeout(() => {
 }, 10000);
 
 // ============================================================
-// Prestige / Ascend
+// Prestige System
 // ============================================================
+
+// --- Prestige stats pane (shown in leaderboard modal, stats only) ---
 function renderPrestige() {
   const pane = $('panePrestige');
   if (!pane) return;
@@ -1140,27 +1149,57 @@ function renderPrestige() {
   const pAscensions = state.ascensions || 0;
   const pUpgrades = state.prestigeUpgrades || [];
   const newChips = newChipsOnAscend();
+  const cpsRate = pLevel * (pUpgrades.includes('recursive') ? 5 : 1);
   pane.innerHTML = `
     <div class="prestige-stats">
       <p>📊 <b>Prestige Level:</b> ${pLevel}</p>
       <p>💠 <b>Chips Available:</b> ${pChips}</p>
-      <p>⚡ <b>CpS Bonus:</b> +${(pLevel * (pUpgrades.includes('recursive') ? 2 : 1))}%</p>
+      <p>⚡ <b>CpS Bonus:</b> +${cpsRate}%</p>
       <p>🍪 <b>All-Time Cookies:</b> ${fmt(state.lifetimeEarned || 0)}</p>
       <p>👆 <b>Total Clicks:</b> ${fmt(state.totalClicks || 0)}</p>
-      <p>♾️ <b>Ascensions:</b> ${pAscensions}</p>
+      <p>⭐ <b>Prestiges:</b> ${pAscensions}</p>
       <p>🧱 <b>Buildings Owned:</b> ${totalBuildings()}</p>
       <p>⬆️ <b>Tier Upgrades:</b> ${(state.tiersBought || []).length}</p>
+      <p>🛒 <b>Prestige Upgrades:</b> ${pUpgrades.length} / ${PRESTIGE_UPGRADES.length}</p>
     </div>
-    <div class="prestige-ascend-box">
-      <p>Ascending resets cookies, buildings & upgrades but gives you <b>permanent CpS bonuses</b>.</p>
+    <p style="font-size:0.75rem; opacity:0.6; margin-top:0.5rem; text-align:center;">
+      Use the ⭐ button on the main screen to open the Prestige Shop.
+    </p>`;
+}
+
+// --- Prestige drawer (full shop, opens from main screen ⭐ button) ---
+const prestigeBtn = $('prestigeBtn');
+const prestigeDrawer = $('prestigeDrawer');
+const prestigeClose = $('prestigeClose');
+const prestigeContent = $('prestigeContent');
+
+function renderPrestigeDrawer() {
+  if (!prestigeContent) return;
+  const pLevel = state.prestigeLevel || 0;
+  const pChips = state.prestigeChips || 0;
+  const pUpgrades = state.prestigeUpgrades || [];
+  const newChips = newChipsOnAscend();
+  const cpsRate = pLevel * (pUpgrades.includes('recursive') ? 5 : 1);
+
+  prestigeContent.innerHTML = `
+    <div class="prestige-stats-mini">
+      <p>📊 <b>Level ${pLevel}</b></p>
+      <p>💠 <b>${pChips} Chips</b></p>
+      <p>⚡ <b>+${cpsRate}% CpS</b></p>
+      <p>⭐ <b>${state.ascensions || 0} Prestiges</b></p>
+    </div>
+
+    <div class="prestige-action-box">
+      <p>Prestiging resets cookies, buildings & upgrades but gives you <b>permanent CpS bonuses</b>.</p>
       ${newChips < 1
         ? `<p>🔒 Requires <b>1B all-time cookies</b> to unlock. You have <b>${fmt(state.lifetimeEarned || 0)}</b> (${Math.min(100, ((state.lifetimeEarned || 0) / 1e9 * 100)).toFixed(2)}%).</p>`
         : `<p>You would earn <b>${newChips}</b> new prestige chip${newChips !== 1 ? 's' : ''} 💠</p>`
       }
-      <button id="ascendBtn" class="ascend-btn" ${newChips < 1 ? 'disabled' : ''}>🔝 Ascend${newChips > 0 ? ` (+${newChips} chips)` : ''}</button>
+      <button id="prestigeActionBtn" class="prestige-btn" ${newChips < 1 ? 'disabled' : ''}>⭐ Prestige${newChips > 0 ? ` (+${newChips} chips)` : ''}</button>
     </div>
-    <h3 style="margin-top:1rem">Prestige Shop</h3>
-    <div class="prestige-shop">
+
+    <div class="prestige-shop-grid">
+      <h3>💠 Prestige Shop</h3>
       ${PRESTIGE_UPGRADES.map(pu => {
         const owned = pUpgrades.includes(pu.id);
         const canBuy = !owned && pChips >= pu.cost;
@@ -1171,16 +1210,41 @@ function renderPrestige() {
         </button>`;
       }).join('')}
     </div>`;
-  // Bind ascend button
-  const ascBtn = $('ascendBtn');
-  if (ascBtn) ascBtn.addEventListener('click', doAscend);
+
+  // Bind prestige button
+  const pBtn = $('prestigeActionBtn');
+  if (pBtn) pBtn.addEventListener('click', doPrestige);
   // Bind prestige shop buttons
-  pane.querySelectorAll('.prestige-item:not(.bought)').forEach(btn => {
+  prestigeContent.querySelectorAll('.prestige-item:not(.bought)').forEach(btn => {
     btn.addEventListener('click', () => buyPrestigeUpgrade(btn.dataset.pid));
   });
 }
 
-function doAscend() {
+// Open/close prestige drawer
+if (prestigeBtn) {
+  prestigeBtn.addEventListener('click', () => {
+    renderPrestigeDrawer();
+    prestigeDrawer.classList.remove('hidden');
+    setTimeout(() => prestigeDrawer.classList.add('open'), 10);
+    haptic('light');
+  });
+}
+if (prestigeClose) {
+  prestigeClose.addEventListener('click', () => {
+    prestigeDrawer.classList.remove('open');
+    setTimeout(() => prestigeDrawer.classList.add('hidden'), 300);
+  });
+}
+if (prestigeDrawer) {
+  prestigeDrawer.addEventListener('click', e => {
+    if (e.target === prestigeDrawer) {
+      prestigeDrawer.classList.remove('open');
+      setTimeout(() => prestigeDrawer.classList.add('hidden'), 300);
+    }
+  });
+}
+
+function doPrestige() {
   const chips = newChipsOnAscend();
   if (chips < 1) return;
   state.prestigeLevel += chips;
@@ -1189,10 +1253,10 @@ function doAscend() {
   // Preserve lifetime earnings (must persist across ascensions for prestige calculations)
   const preservedLifetimeEarned = state.lifetimeEarned;
   // Reset run state
-  state.cookies = state.prestigeUpgrades.includes('genesis') ? 1000 : 0;
+  state.cookies = state.prestigeUpgrades.includes('genesis') ? 10000 : 0;
   state.totalEarned = 0;
   state.owned = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
-  if (state.prestigeUpgrades.includes('whale')) state.owned.grandma = 1;
+  if (state.prestigeUpgrades.includes('whale')) state.owned.grandma = 5;
   state.tiersBought = [];
   // IMPORTANT: Keep achievements unlocked across ascensions (permanent accomplishments)
   // DO NOT reset state.unlocked = [];
@@ -1201,9 +1265,10 @@ function doAscend() {
   // Re-render everything
   renderOrbits();
   render();
+  renderPrestigeDrawer();
   renderPrestige();
   saveState();
-  toast('🔝', 'Ascended!', `+${chips} prestige chips. Your empire grows stronger.`);
+  toast('⭐', 'Prestiged!', `+${chips} prestige chips. Your empire grows stronger.`);
   haptic('heavy');
 }
 
@@ -1216,7 +1281,8 @@ function buyPrestigeUpgrade(id) {
   toast(pu.emoji, pu.name, pu.desc);
   haptic('medium');
   saveState();
-  renderPrestige();
+  renderPrestigeDrawer();
+  render(); // Update main screen since multipliers changed
 }
 
 // ============================================================

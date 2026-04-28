@@ -54,12 +54,26 @@
   <!-- Floating share button (bottom-left) -->
   <button id="share" class="share-fab" aria-label="Share score">↗</button>
 
+  <!-- Floating prestige button (top-left, below leaderboard) -->
+  <button id="prestigeBtn" class="prestige-fab hidden" aria-label="Prestige Shop">⭐</button>
+
   <!-- Floating shop button (bottom-center) -->
   <button id="shopBtn" class="shop-fab" aria-label="Open shop">
     <span class="shop-fab-emoji">🛒</span>
     <span class="shop-fab-label">Shop</span>
     <span id="shopAffordable" class="shop-fab-badge hidden">0</span>
   </button>
+
+  <!-- Prestige drawer (slides up from bottom) -->
+  <div id="prestigeDrawer" class="drawer-overlay hidden">
+    <div class="drawer">
+      <div class="drawer-head">
+        <h2>⭐ Prestige</h2>
+        <button id="prestigeClose" class="ghost" aria-label="Close">×</button>
+      </div>
+      <div id="prestigeContent" class="prestige-drawer-content"></div>
+    </div>
+  </div>
 
   <!-- Shop drawer (slides up from bottom) -->
   <div id="shopDrawer" class="drawer-overlay hidden">
@@ -100,7 +114,7 @@
       <div class="drawer-tabs">
         <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
         <button class="profile-tab-btn" data-ptab="achievements">🏅 Achieve</button>
-        <button class="profile-tab-btn" data-ptab="prestige">🔝 Prestige</button>
+        <button class="profile-tab-btn" data-ptab="prestige">⭐ Stats</button>
       </div>
 
       <!-- Leaderboard pane -->
@@ -116,7 +130,7 @@
         <div id="achList" class="ach-list"></div>
       </div>
 
-      <!-- Prestige pane -->
+      <!-- Prestige stats pane (stats only, shop is in the prestige drawer) -->
       <div id="panePrestige" class="profile-pane hidden"></div>
     </div>
   </div>
