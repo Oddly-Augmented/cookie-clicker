@@ -909,7 +909,7 @@ async function autoSubmitScore() {
     if (score - state.lastSubmittedScore < minBump) return;
 
     const username = ctx?.user?.username || ctx?.user?.displayName || 'Anonymous';
-    const r = await fetch('/api/leaderboard', {
+    const r = await sdk.quickAuth.fetch('/api/leaderboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -953,6 +953,7 @@ profileTabs.forEach(btn => {
 });
 
 async function openProfile() {
+  haptic('medium');
   lbModal.classList.remove('hidden');
   // Default to leaderboard view every open
   profileTabs.forEach(b => b.classList.toggle('active', b.dataset.ptab === 'leaderboard'));
@@ -1047,6 +1048,7 @@ function maybePromptAdd() {
 
 addBtn.addEventListener('click', async () => {
   try {
+    haptic('medium');
     await sdk.actions.addMiniApp();
     toast('⭐', 'Added!', 'FarClick is in your apps.');
     autoSubmitScore();
@@ -1302,6 +1304,7 @@ render();
 scheduleGoldenCookie();
 
 await sdk.actions.ready();
+sdk.back.enableWebNavigation();
 
 // Cache FID for admin checks in synchronous render()
 try {
@@ -1312,3 +1315,15 @@ try {
 
 // Submit shortly after launch so returning players land on the board.
 setTimeout(autoSubmitScore, 5_000);
+
+// Handle shared cast context
+try {
+  const context = await sdk.context;
+  if (context?.location?.type === 'cast_share') {
+    const cast = context.location.cast;
+    toast('📢', `Shared from @${cast.author.username}`, 'Loading stats...');
+    setTimeout(openProfile, 1500);
+  }
+} catch (e) {
+  console.error("Context check failed", e);
+}
