@@ -181,10 +181,70 @@ function loadState() {
     return defaultState();
   } catch { return defaultState(); }
 }
+
 function saveState() {
   state.lastPlayed = Date.now();
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch {}
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    syncToCloud();
+  } catch (e) {
+    console.error('Local save failed', e);
+  }
 }
+
+let lastCloudSync = 0;
+async function syncToCloud() {
+  const now = Date.now();
+  if (now - lastCloudSync < 10000) return; // Sync at most every 10 seconds
+  
+  try {
+    const ctx = await sdk.context;
+    const fid = ctx?.user?.fid;
+    if (!fid || fid === 1014465) return;
+
+    lastCloudSync = now;
+    await sdk.quickAuth.fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fid, state })
+    });
+  } catch (e) {
+    console.error('Cloud sync failed', e);
+  }
+}
+
+async function loadFromCloud() {
+  try {
+    const ctx = await sdk.context;
+    const fid = ctx?.user?.fid;
+    if (!fid || fid === 1014465) return;
+
+    const r = await sdk.quickAuth.fetch(`/api/sync?fid=${fid}`);
+    if (!r.ok) return;
+    
+    const data = await r.json();
+    if (!data || !data.state) return;
+
+    const cloudState = data.state;
+    
+    // Simple conflict resolution: Cloud wins if it has more lifetime cookies
+    // or if the local save is non-existent.
+    const cloudCookies = cloudState.lifetimeEarned || 0;
+    const localCookies = state.lifetimeEarned || 0;
+    
+    if (cloudCookies > localCookies) {
+      console.log(`Cloud sync: Found better save (${fmt(cloudCookies)} > ${fmt(localCookies)})`);
+      state = Object.assign(state, cloudState);
+      saveState(); // Update local storage with cloud data
+      renderOrbits();
+      render();
+      toast('☁️', 'Cloud Sync', 'Progress restored from your account.');
+    }
+  } catch (e) {
+    console.error('Cloud load failed', e);
+  }
+}
+
 setInterval(saveState, 3000);
 window.addEventListener('beforeunload', saveState);
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
@@ -1315,6 +1375,8 @@ try {
 
 // Submit shortly after launch so returning players land on the board.
 setTimeout(autoSubmitScore, 5_000);
+// Attempt cloud load
+loadFromCloud();
 
 // Handle shared cast context
 try {
