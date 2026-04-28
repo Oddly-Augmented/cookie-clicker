@@ -372,11 +372,14 @@ window.buyGoldenNFT = async function() {
       ]
     });
 
-    // 3. Send the transaction to the specific Thirdweb contract on Base
-    const result = await sdk.actions.sendTransaction({
-      to: '0xB8a942d85A42b926C23B7f33A255b8DF384b15c8',
-      value: priceInWei,
-      data: data
+    // 3. Send the transaction via the native JSON-RPC provider on Base
+    const result = await sdk.wallet.ethProvider.request({
+      method: 'eth_sendTransaction',
+      params: [{
+        to: '0xB8a942d85A42b926C23B7f33A255b8DF384b15c8',
+        value: '0x' + priceInWei.toString(16), // JSON-RPC requires hex strings
+        data: data
+      }]
     });
     
     if (result) {

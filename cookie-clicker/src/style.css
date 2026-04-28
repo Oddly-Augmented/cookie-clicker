@@ -42,6 +42,22 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 #lbBtn  { left: 0; }
 #share  { right: 0; }
 
+.nft-quick-btn {
+  left: 3rem;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+}
+.nft-quick-btn img {
+  width: 2rem; height: 2rem;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+  transition: transform 0.15s ease;
+}
+.nft-quick-btn:active img { transform: scale(0.9); }
+
 /* --- stage --- */
 .stage {
   position: relative;
