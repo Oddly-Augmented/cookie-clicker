@@ -43,36 +43,43 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 #share  { right: 0; }
 
 .nft-quick-btn {
-  left: 3rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0.25rem auto 0;
   background: none !important;
   border: none !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
-  padding: 0 !important;
+  padding: 0.2rem 0.6rem !important;
   overflow: visible !important;
+  cursor: pointer;
+  top: auto; left: auto; transform: none;
+  width: auto; height: auto;
 }
 .nft-quick-btn img {
-  width: 2.2rem; height: 2.2rem;
+  width: 1.6rem; height: 1.6rem;
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
   transition: transform 0.15s ease;
 }
 .nft-quick-btn:active img { transform: scale(0.9); }
 .nft-quick-btn::after {
-  content: "Golden Cookie\A 2x Everything";
-  white-space: pre;
-  position: absolute;
-  top: 90%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.55rem;
+  content: "Golden Cookie · 2x Everything";
+  white-space: nowrap;
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  font-size: 0.6rem;
   line-height: 1.15;
   color: #FFD700;
   text-align: center;
   font-weight: 800;
   text-shadow: 0 2px 5px rgba(0,0,0,1);
   pointer-events: none;
-  width: 6rem;
 }
 
 /* --- stage --- */
