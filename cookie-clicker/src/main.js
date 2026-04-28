@@ -129,7 +129,18 @@ let state = loadState();
 function loadState() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return { ...defaultState(), ...JSON.parse(raw) };
+    if (raw) {
+      const saved = { ...defaultState(), ...JSON.parse(raw) };
+      // Guard against null values from corrupted saves
+      saved.prestigeLevel = saved.prestigeLevel ?? 0;
+      saved.prestigeChips = saved.prestigeChips ?? 0;
+      saved.prestigeUpgrades = saved.prestigeUpgrades ?? [];
+      saved.ascensions = saved.ascensions ?? 0;
+      saved.lifetimeEarned = saved.lifetimeEarned ?? saved.totalEarned ?? 0;
+      saved.totalClicks = saved.totalClicks ?? 0;
+      saved.lastSubmittedScore = saved.lastSubmittedScore ?? 0;
+      return saved;
+    }
     const migrated = migrateV1();
     if (migrated) return migrated;
     return defaultState();
@@ -547,7 +558,8 @@ async function autoSubmitScore() {
     const fid = ctx?.user?.fid;
     if (!fid) return;
 
-    const score = Math.floor(state.totalEarned);
+    // Use lifetimeEarned (all-time cookies) as the leaderboard score
+    const score = Math.floor(state.lifetimeEarned);
     // Only submit if we've gained at least 10% more cookies since last submit (and at least +50).
     const minBump = Math.max(50, state.lastSubmittedScore * 0.1);
     if (score - state.lastSubmittedScore < minBump) return;
@@ -556,7 +568,11 @@ async function autoSubmitScore() {
     const r = await fetch('/api/leaderboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fid, username, score, prestige_level: state.prestigeLevel })
+      body: JSON.stringify({
+        fid, username, score,
+        prestige_level: state.prestigeLevel || 0,
+        ascensions: state.ascensions || 0
+      })
     });
     if (r.ok) {
       state.lastSubmittedScore = score;
@@ -619,7 +635,7 @@ async function openLeaderboard() {
         <div class="lb-row">
           <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
           <span class="lb-name">${escapeHtml(row.username)}</span>
-          <span class="lb-prestige">${row.prestige_level ? `🔝 ${row.prestige_level}` : ''}</span>
+          <span class="lb-prestige">${row.ascensions ? `♾️ ${row.ascensions}` : ''}</span>
           <span class="lb-score">${fmt(row.score)}</span>
         </div>`).join('');
     }
@@ -630,9 +646,9 @@ async function openLeaderboard() {
       const me = data.find(r => r.fid === ctx.user.fid);
       if (me) {
         const rank = data.indexOf(me) + 1;
-        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} cookies (Prestige: ${me.prestige_level || 0})`;
+        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} all-time cookies (${me.ascensions || 0} ascensions)`;
       } else {
-        lbYou.textContent = `Your score: ${fmt(state.totalEarned)} (keep baking to crack the top 100)`;
+        lbYou.textContent = `Your score: ${fmt(state.lifetimeEarned)} (keep baking to crack the top 100)`;
       }
     } else {
       lbYou.textContent = 'Open in Farcaster to appear on the leaderboard.';
@@ -691,17 +707,21 @@ addClose.addEventListener('click', () => addBanner.classList.add('hidden'));
 function renderPrestige() {
   const pane = $('panePrestige');
   if (!pane) return;
+  const pLevel = state.prestigeLevel || 0;
+  const pChips = state.prestigeChips || 0;
+  const pAscensions = state.ascensions || 0;
+  const pUpgrades = state.prestigeUpgrades || [];
   const newChips = newChipsOnAscend();
   pane.innerHTML = `
     <div class="prestige-stats">
-      <p>📊 <b>Prestige Level:</b> ${state.prestigeLevel}</p>
-      <p>💠 <b>Chips Available:</b> ${state.prestigeChips}</p>
-      <p>⚡ <b>CpS Bonus:</b> +${(state.prestigeLevel * (state.prestigeUpgrades.includes('recursive') ? 2 : 1))}%</p>
-      <p>🍪 <b>Lifetime Cookies:</b> ${fmt(state.lifetimeEarned)}</p>
-      <p>👆 <b>Total Clicks:</b> ${fmt(state.totalClicks)}</p>
-      <p>♾️ <b>Ascensions:</b> ${state.ascensions}</p>
+      <p>📊 <b>Prestige Level:</b> ${pLevel}</p>
+      <p>💠 <b>Chips Available:</b> ${pChips}</p>
+      <p>⚡ <b>CpS Bonus:</b> +${(pLevel * (pUpgrades.includes('recursive') ? 2 : 1))}%</p>
+      <p>🍪 <b>All-Time Cookies:</b> ${fmt(state.lifetimeEarned || 0)}</p>
+      <p>👆 <b>Total Clicks:</b> ${fmt(state.totalClicks || 0)}</p>
+      <p>♾️ <b>Ascensions:</b> ${pAscensions}</p>
       <p>🧱 <b>Buildings Owned:</b> ${totalBuildings()}</p>
-      <p>⬆️ <b>Tier Upgrades:</b> ${state.tiersBought.length}</p>
+      <p>⬆️ <b>Tier Upgrades:</b> ${(state.tiersBought || []).length}</p>
     </div>
     <div class="prestige-ascend-box">
       <p>Ascending resets cookies, buildings & upgrades but gives you <b>permanent CpS bonuses</b>.</p>
@@ -711,8 +731,8 @@ function renderPrestige() {
     <h3 style="margin-top:1rem">Prestige Shop</h3>
     <div class="prestige-shop">
       ${PRESTIGE_UPGRADES.map(pu => {
-        const owned = state.prestigeUpgrades.includes(pu.id);
-        const canBuy = !owned && state.prestigeChips >= pu.cost;
+        const owned = pUpgrades.includes(pu.id);
+        const canBuy = !owned && pChips >= pu.cost;
         return `<button class="prestige-item ${owned ? 'bought' : ''} ${canBuy ? 'affordable' : ''}" data-pid="${pu.id}" ${owned || !canBuy ? 'disabled' : ''}>
           <span class="emoji">${pu.emoji}</span>
           <span class="info"><b>${pu.name}</b><small>${pu.desc}</small></span>
