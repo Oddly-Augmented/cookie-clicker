@@ -806,15 +806,36 @@ function renderAchievements() {
 // ============================================================
 function applyOfflineEarnings() {
   if (!state.lastPlayed) return;
-  const seconds = Math.min((Date.now() - state.lastPlayed) / 1000, 60 * 60 * 8);
-  if (seconds < 30) return;
-  const offlineMult = state.prestigeUpgrades.includes('diamond') ? 0.625 : 0.5;
-  const earned = perSec() * seconds * offlineMult;
-  if (earned < 1) return;
-  state.cookies += earned;
-  state.totalEarned += earned;
-  state.lifetimeEarned += earned;
-  toast('🌙', 'Welcome back!', `Your bots made ${fmt(earned)} cookies while you were away.`);
+  const actualSeconds = (Date.now() - state.lastPlayed) / 1000;
+  const seconds = Math.min(actualSeconds, 60 * 60 * 8); // Cap offline production to 8h
+  
+  if (seconds >= 30) {
+    const offlineMult = state.prestigeUpgrades.includes('diamond') ? 0.625 : 0.5;
+    const earned = perSec() * seconds * offlineMult;
+    
+    if (earned >= 1) {
+      state.cookies += earned;
+      state.totalEarned += earned;
+      state.lifetimeEarned += earned;
+      
+      if (actualSeconds > 86400) { // Away for 1+ days
+        toast('⏰', "Cookies won't click themselves!", `But your bots did bake ${fmt(earned)} cookies while you were gone.`);
+      } else {
+        toast('🌙', 'Welcome back!', `Your bots baked ${fmt(earned)} cookies while you were away.`);
+      }
+    }
+  }
+
+  // Prestige progress motivation notification
+  const nextPrestigeCost = Math.pow(state.prestigeLevel + 1, 2) * 1e9;
+  if (state.lifetimeEarned > 0 && state.lifetimeEarned < nextPrestigeCost) {
+    const percent = Math.floor((state.lifetimeEarned / nextPrestigeCost) * 100);
+    if (percent >= 50) {
+      setTimeout(() => {
+        toast('✨', 'Ascension approaches...', `You're ${percent}% of the way to prestiging. Get to clicking!`);
+      }, 4500); // Wait for the first toast to clear
+    }
+  }
 }
 function applyDailyBonus() {
   const now = Date.now();
