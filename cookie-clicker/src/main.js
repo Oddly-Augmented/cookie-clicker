@@ -173,6 +173,7 @@ function loadState() {
       saved.lastAdBoost = saved.lastAdBoost ?? 0;
       saved.adViews = saved.adViews ?? 0;
       saved.ownsGoldenNFT = saved.ownsGoldenNFT ?? false;
+      saved.followsOddly = saved.followsOddly ?? false;
       return saved;
     }
     const migrated = migrateV1();
@@ -878,7 +879,8 @@ async function autoSubmitScore() {
         fid, username, score,
         prestige_level: state.prestigeLevel || 0,
         ascensions: state.ascensions || 0,
-        has_nft: state.ownsGoldenNFT || false
+        has_nft: state.ownsGoldenNFT || false,
+        follows_oddly: state.followsOddly || false
       })
     });
     if (r.ok) {
@@ -1015,6 +1017,43 @@ addBtn.addEventListener('click', async () => {
   addBanner.classList.add('hidden');
 });
 addClose.addEventListener('click', () => addBanner.classList.add('hidden'));
+
+// ============================================================
+// Follow Prompt
+// ============================================================
+const followModal = $('followModal');
+const followClose = $('followClose');
+const followBtn = $('followBtn');
+
+if (followClose && followModal) {
+  followClose.addEventListener('click', () => followModal.classList.add('hidden'));
+}
+if (followBtn && followModal) {
+  followBtn.addEventListener('click', async () => {
+    try {
+      await sdk.actions.viewProfile({ fid: 1014465 });
+      if (!state.followsOddly) {
+        state.followsOddly = true;
+        state.cookies += 5000;
+        state.totalEarned += 5000;
+        state.lifetimeEarned += 5000;
+        saveState();
+        render();
+        toast('🎉', 'Thanks for following!', '+5,000 Cookies added to your bakery!');
+        autoSubmitScore();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    followModal.classList.add('hidden');
+  });
+}
+
+setTimeout(() => {
+  if (!state.followsOddly && state.totalEarned >= 100 && followModal) {
+    followModal.classList.remove('hidden');
+  }
+}, 10000);
 
 // ============================================================
 // Prestige / Ascend

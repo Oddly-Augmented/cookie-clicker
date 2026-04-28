@@ -19,11 +19,22 @@ export default async function handler(req, res) {
   // ---- GET: top 100 scores with prestige ----
   if (req.method === 'GET') {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('leaderboard')
-        .select('fid, username, score, prestige_level, ascensions, has_nft')
+        .select('fid, username, score, prestige_level, ascensions, has_nft, follows_oddly')
         .order('score', { ascending: false })
         .limit(100);
+
+      if (error && error.message && error.message.includes('does not exist')) {
+        // Fallback if the user hasn't created the new columns in Supabase yet
+        const fallback = await supabase
+          .from('leaderboard')
+          .select('fid, username, score, prestige_level, ascensions')
+          .order('score', { ascending: false })
+          .limit(100);
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error) {
         console.error('Leaderboard SELECT error:', error);
@@ -39,7 +50,7 @@ export default async function handler(req, res) {
   // ---- POST: submit score with prestige ----
   if (req.method === 'POST') {
     try {
-      const { fid, username, score, prestige_level, ascensions, has_nft } = req.body || {};
+      const { fid, username, score, prestige_level, ascensions, has_nft, follows_oddly } = req.body || {};
       if (!fid || typeof score !== 'number') {
         return res.status(400).json({ error: 'fid and numeric score required' });
       }
@@ -60,17 +71,30 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true, updated: false });
       }
 
-      const { error: upsertErr } = await supabase
+      let upsertData = {
+        fid,
+        username: (username || 'Anonymous').slice(0, 32),
+        score,
+        prestige_level: prestige_level || 0,
+        ascensions: ascensions || 0,
+        has_nft: has_nft || false,
+        follows_oddly: follows_oddly || false,
+        updated_at: new Date().toISOString()
+      };
+
+      let { error: upsertErr } = await supabase
         .from('leaderboard')
-        .upsert({
-          fid,
-          username: (username || 'Anonymous').slice(0, 32),
-          score,
-          prestige_level: prestige_level || 0,
-          ascensions: ascensions || 0,
-          has_nft: has_nft || false,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'fid' });
+        .upsert(upsertData, { onConflict: 'fid' });
+
+      if (upsertErr && upsertErr.message && upsertErr.message.includes('does not exist')) {
+        // Fallback to basic columns
+        delete upsertData.has_nft;
+        delete upsertData.follows_oddly;
+        const fallback = await supabase
+          .from('leaderboard')
+          .upsert(upsertData, { onConflict: 'fid' });
+        upsertErr = fallback.error;
+      }
 
       if (upsertErr) {
         console.error('Leaderboard UPSERT error:', upsertErr);
