@@ -1,5 +1,6 @@
 import './style.css';
 import { sdk } from '@farcaster/miniapp-sdk';
+import { encodeFunctionData } from 'viem';
 
 // ============================================================
 // Upgrade definitions
@@ -119,7 +120,9 @@ const defaultState = () => ({
   // Ad boost
   adBoostEnd: 0,
   lastAdBoost: 0,
-  adViews: 0
+  adViews: 0,
+  // Web3
+  ownsGoldenNFT: false
 });
 
 // Migrate from v1 save
@@ -150,6 +153,7 @@ function loadState() {
       saved.adBoostEnd = saved.adBoostEnd ?? 0;
       saved.lastAdBoost = saved.lastAdBoost ?? 0;
       saved.adViews = saved.adViews ?? 0;
+      saved.ownsGoldenNFT = saved.ownsGoldenNFT ?? false;
       return saved;
     }
     const migrated = migrateV1();
@@ -181,7 +185,8 @@ const prestigeMult = () => {
 };
 const protocolMult = () => state.prestigeUpgrades.includes('protocol') ? 1.5 : 1;
 const wagmiMult    = () => state.prestigeUpgrades.includes('wagmi') ? 2 : 1;
-const globalMult   = () => milkMult() * prestigeMult() * protocolMult() * wagmiMult();
+const nftMult      = () => state.ownsGoldenNFT ? 2 : 1;
+const globalMult   = () => milkMult() * prestigeMult() * protocolMult() * wagmiMult() * nftMult();
 
 const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
 const adBoostMult   = () => adBoostActive() ? 1.5 : 1;
@@ -272,6 +277,20 @@ TIER_UPGRADES.forEach(t => {
   shopEl.appendChild(row);
 });
 
+// NFT Row
+const nftBtn = document.createElement('button');
+nftBtn.className = 'shop-item shop-nft tab-hidden';
+nftBtn.dataset.kind = 'nft';
+nftBtn.innerHTML = `
+  <span class="emoji">💎</span>
+  <span class="info">
+    <span class="name">Golden Cookie NFT</span>
+    <span class="effect">2× Multiplier & Golden visual! Max Supply: 100</span>
+  </span>
+  <span class="cost" id="nftCost" style="color:#4caf50;">$2</span>`;
+nftBtn.addEventListener('click', () => buyGoldenNFT());
+shopEl.appendChild(nftBtn);
+
 function buyTier(t) {
   if (state.tiersBought.includes(t.id)) return;
   if (state.owned[t.buildingId] < t.need) return;
@@ -292,6 +311,85 @@ function buy(u) {
   renderOrbits();
   render();
 }
+
+window.buyGoldenNFT = async function() {
+  if (state.ownsGoldenNFT) {
+    toast('💎', 'You already own this NFT!');
+    return;
+  }
+  
+  try {
+    toast('💎', 'Connecting...', 'Requesting wallet address');
+    
+    // 1. Get the user's connected wallet address via Farcaster SDK
+    const accounts = await sdk.wallet.ethProvider.request({ method: 'eth_requestAccounts' });
+    const userAddress = accounts[0];
+    if (!userAddress) throw new Error('No wallet connected');
+
+    toast('💎', 'Check your Farcaster client to confirm...', 'Requesting transaction');
+    
+    // 2. Encode the Thirdweb ERC721 Drop `claim` function
+    const claimAbi = [{
+      "inputs": [
+        { "internalType": "address", "name": "_receiver", "type": "address" },
+        { "internalType": "uint256", "name": "_quantity", "type": "uint256" },
+        { "internalType": "address", "name": "_currency", "type": "address" },
+        { "internalType": "uint256", "name": "_pricePerToken", "type": "uint256" },
+        {
+          "components": [
+            { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" },
+            { "internalType": "uint256", "name": "quantityLimitPerWallet", "type": "uint256" },
+            { "internalType": "uint256", "name": "pricePerToken", "type": "uint256" },
+            { "internalType": "address", "name": "currency", "type": "address" }
+          ],
+          "internalType": "struct IDrop.AllowlistProof",
+          "name": "_allowlistProof",
+          "type": "tuple"
+        },
+        { "internalType": "bytes", "name": "_data", "type": "bytes" }
+      ],
+      "name": "claim",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }];
+
+    // Price is roughly 0.0006 ETH (~$2)
+    const priceInWei = 600000000000000n;
+    const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+    const data = encodeFunctionData({
+      abi: claimAbi,
+      functionName: 'claim',
+      args: [
+        userAddress, 
+        1n, // quantity
+        ETH_ADDRESS, // currency
+        priceInWei, // pricePerToken
+        { proof: [], quantityLimitPerWallet: 0n, pricePerToken: priceInWei, currency: ETH_ADDRESS }, // allowlistProof
+        '0x' // empty data
+      ]
+    });
+
+    // 3. Send the transaction to the specific Thirdweb contract on Base
+    const result = await sdk.actions.sendTransaction({
+      to: '0xB8a942d85A42b926C23B7f33A255b8DF384b15c8',
+      value: priceInWei,
+      data: data
+    });
+    
+    if (result) {
+      state.ownsGoldenNFT = true;
+      saveState();
+      toast('💎', 'Golden NFT Acquired!', '2x multiplier active and your cookie is golden!');
+      haptic('heavy');
+      render();
+    }
+  } catch (err) {
+    console.error('NFT Purchase failed:', err);
+    toast('❌', 'Transaction failed or canceled');
+  }
+};
 
 // Tabs
 tabBtns.forEach(btn => {
@@ -522,12 +620,38 @@ function render() {
     if (canBuy) affordable++;
   });
 
+  // NFT row visibility
+  const nftRow = shopEl.querySelector('.shop-nft');
+  if (nftRow) {
+    nftRow.classList.toggle('tab-hidden', activeTab !== 'nft');
+    if (state.ownsGoldenNFT) {
+      nftRow.disabled = true;
+      nftRow.querySelector('#nftCost').textContent = '✔ Owned';
+      nftRow.style.order = 10;
+    } else {
+      nftRow.disabled = false;
+      nftRow.style.order = 0;
+    }
+  }
+
   // Update floating shop button badge
   if (affordable > 0) {
     shopBadge.classList.remove('hidden');
     shopBadge.textContent = affordable;
   } else {
     shopBadge.classList.add('hidden');
+  }
+
+  // Golden Cookie Visual
+  const cookieImg = document.querySelector('#cookie img');
+  if (cookieImg) {
+    if (state.ownsGoldenNFT) {
+      cookieImg.src = '/golden-cookie.png';
+      cookieImg.style.filter = 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))';
+    } else {
+      cookieImg.src = '/farcaster-cookie.png';
+      cookieImg.style.filter = 'none';
+    }
   }
 }
 
