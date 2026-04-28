@@ -1,115 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>FarClick</title>
 
-    <!-- Farcaster Mini App embed: turns a pasted URL into a launchable card in casts. -->
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://cookie-clicker-hv5w.vercel.app/og.png","button":{"title":"FarClick","action":{"type":"launch_frame","name":"FarClick","url":"https://cookie-clicker-hv5w.vercel.app/","splashImageUrl":"https://cookie-clicker-hv5w.vercel.app/splash.png","splashBackgroundColor":"#080418"}}}' />
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <!-- Bonus bar: countdown shown when a Golden Cookie is active -->
-    <div id="bonusBar" class="bonus-bar">
-      <span id="bonusLabel">✨ 5× BONUS — 30s</span>
-      <div id="bonusProgress" class="bonus-progress"></div>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>FarClick</title>
 
-    <main class="app">
-      <header class="head">
-        <div class="title-row">
-          <button id="lbBtn"  class="icon-btn" aria-label="Leaderboard">🏆</button>
-          <h1>FarClick</h1>
-          <button id="share"  class="icon-btn" aria-label="Share score">↗</button>
-        </div>
-        <p class="stat"><span id="count">0</span> cookies</p>
-        <p class="sub">
-          +<span id="perClick">1</span> per click
-          · <span id="perSec">0</span>/sec
-        </p>
-      </header>
+  <!-- Farcaster Mini App embed: turns a pasted URL into a launchable card in casts. -->
+  <meta name="fc:frame"
+    content='{"version":"1","imageUrl":"https://cookie-clicker-hv5w.vercel.app/og.png","button":{"title":"FarClick","action":{"type":"launch_frame","name":"FarClick","url":"https://cookie-clicker-hv5w.vercel.app/","splashImageUrl":"https://cookie-clicker-hv5w.vercel.app/splash.png","splashBackgroundColor":"#080418"}}}' />
 
-      <div class="stage" id="stage">
-        <div class="orbit orbit-inner" id="orbit-inner"></div>
-        <div class="orbit orbit-mid"   id="orbit-mid"></div>
-        <div class="orbit orbit-outer" id="orbit-outer"></div>
-        <div class="fx" id="fx"></div>
-        <button id="cookie" class="cookie" aria-label="Click the cookie">
-          <img src="/farcaster-cookie.png" alt="Cookie" draggable="false" />
-        </button>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- OpenAds Network -->
+  <script src="https://api.openads.world/snippet.js"></script>
+  <link rel="stylesheet" href="https://api.openads.world/api/v1/serve/dynamic-css?publisher=0x3d915e82d079f410d99dc358221a0f6efd4446f1">
+</head>
+
+<body>
+  <!-- Bonus bar: countdown shown when a Golden Cookie is active -->
+  <div id="bonusBar" class="bonus-bar">
+    <span id="bonusLabel">✨ 5× BONUS — 30s</span>
+    <div id="bonusProgress" class="bonus-progress"></div>
+  </div>
+
+  <main class="app">
+    <header class="head">
+      <div class="title-row">
+        <button id="lbBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
+        <h1>FarClick</h1>
+        <button id="share" class="icon-btn" aria-label="Share score">↗</button>
       </div>
-    </main>
+      <p class="stat"><span id="count">0</span> cookies</p>
+      <p class="sub">
+        +<span id="perClick">1</span> per click
+        · <span id="perSec">0</span>/sec
+      </p>
+    </header>
 
-    <!-- Floating shop button (bottom-center) -->
-    <button id="shopBtn" class="shop-fab" aria-label="Open shop">
-      <span class="shop-fab-emoji">🛒</span>
-      <span class="shop-fab-label">Shop</span>
-      <span id="shopAffordable" class="shop-fab-badge hidden">0</span>
-    </button>
+    <div class="stage" id="stage">
+      <div class="orbit orbit-inner" id="orbit-inner"></div>
+      <div class="orbit orbit-mid" id="orbit-mid"></div>
+      <div class="orbit orbit-outer" id="orbit-outer"></div>
+      <div class="fx" id="fx"></div>
+      <button id="cookie" class="cookie" aria-label="Click the cookie">
+        <img src="/farcaster-cookie.png" alt="Cookie" draggable="false" />
+      </button>
+    </div>
+  </main>
 
-    <!-- Shop drawer (slides up from bottom) -->
-    <div id="shopDrawer" class="drawer-overlay hidden">
-      <div class="drawer">
-        <div class="drawer-handle"></div>
-        <div class="drawer-head">
-          <h2>🛒 Shop</h2>
-          <button id="shopClose" class="ghost" aria-label="Close">×</button>
-        </div>
-        <div class="drawer-tabs">
-          <button class="tab-btn active" data-tab="click">👆 Click</button>
-          <button class="tab-btn"        data-tab="cps">⏱️ Auto</button>
-          <button class="tab-btn"        data-tab="upgrade">⬆️ Upgrades</button>
-        </div>
-        <div id="shop" class="shop-list"></div>
+  <!-- Floating shop button (bottom-center) -->
+  <button id="shopBtn" class="shop-fab" aria-label="Open shop">
+    <span class="shop-fab-emoji">🛒</span>
+    <span class="shop-fab-label">Shop</span>
+    <span id="shopAffordable" class="shop-fab-badge hidden">0</span>
+  </button>
+
+  <!-- Shop drawer (slides up from bottom) -->
+  <div id="shopDrawer" class="drawer-overlay hidden">
+    <div class="drawer">
+      <div class="drawer-handle"></div>
+      <div class="drawer-head">
+        <h2>🛒 Shop</h2>
+        <button id="shopClose" class="ghost" aria-label="Close">×</button>
       </div>
-    </div>
-
-    <!-- Toast popups (achievements, welcome back, etc.) -->
-    <div id="toasts" class="toasts"></div>
-
-    <!-- "Add Mini App" prompt -->
-    <div id="addBanner" class="add-banner hidden">
-      <span>Loving it? Add to your apps</span>
-      <button id="addBtn">Add</button>
-      <button id="addClose" class="ghost" aria-label="Dismiss">×</button>
-    </div>
-
-    <!-- Profile modal: two tabs, Leaderboard + Achievements -->
-    <div id="lbModal" class="modal-overlay hidden">
-      <div class="modal">
-        <div class="modal-head">
-          <h2 id="profileTitle">🏆 Leaderboard</h2>
-          <button id="lbClose" class="ghost" aria-label="Close">×</button>
-        </div>
-
-        <div class="drawer-tabs">
-          <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
-          <button class="profile-tab-btn"        data-ptab="achievements">🏅 Achieve</button>
-          <button class="profile-tab-btn"        data-ptab="prestige">🔝 Prestige</button>
-        </div>
-
-        <!-- Leaderboard pane -->
-        <div id="paneLeaderboard" class="profile-pane">
-          <p class="modal-sub">Top all-time cookie bakers</p>
-          <div id="lbList" class="lb-list"></div>
-          <p id="lbYou" class="lb-you"></p>
-        </div>
-
-        <!-- Achievements pane -->
-        <div id="paneAchievements" class="profile-pane hidden">
-          <p class="modal-sub"><span id="achProgress">0 / 0</span> unlocked (+1% CpS each)</p>
-          <div id="achList" class="ach-list"></div>
-        </div>
-
-        <!-- Prestige pane -->
-        <div id="panePrestige" class="profile-pane hidden"></div>
+      <div class="drawer-tabs">
+        <button class="tab-btn active" data-tab="click">👆 Click</button>
+        <button class="tab-btn" data-tab="cps">⏱️ Auto</button>
+        <button class="tab-btn" data-tab="upgrade">⬆️ Upgrades</button>
       </div>
+      <div id="shop" class="shop-list"></div>
     </div>
+  </div>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  <!-- Toast popups (achievements, welcome back, etc.) -->
+  <div id="toasts" class="toasts"></div>
+
+  <!-- "Add Mini App" prompt -->
+  <div id="addBanner" class="add-banner hidden">
+    <span>Loving it? Add to your apps</span>
+    <button id="addBtn">Add</button>
+    <button id="addClose" class="ghost" aria-label="Dismiss">×</button>
+  </div>
+
+  <!-- Profile modal: two tabs, Leaderboard + Achievements -->
+  <div id="lbModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="profileTitle">🏆 Leaderboard</h2>
+        <button id="lbClose" class="ghost" aria-label="Close">×</button>
+      </div>
+
+      <div class="drawer-tabs">
+        <button class="profile-tab-btn active" data-ptab="leaderboard">🏆 Board</button>
+        <button class="profile-tab-btn" data-ptab="achievements">🏅 Achieve</button>
+        <button class="profile-tab-btn" data-ptab="prestige">🔝 Prestige</button>
+      </div>
+
+      <!-- Leaderboard pane -->
+      <div id="paneLeaderboard" class="profile-pane">
+        <p class="modal-sub">Top all-time cookie bakers</p>
+        <div id="lbList" class="lb-list"></div>
+        <p id="lbYou" class="lb-you"></p>
+      </div>
+
+      <!-- Achievements pane -->
+      <div id="paneAchievements" class="profile-pane hidden">
+        <p class="modal-sub"><span id="achProgress">0 / 0</span> unlocked (+1% CpS each)</p>
+        <div id="achList" class="ach-list"></div>
+      </div>
+
+      <!-- Prestige pane -->
+      <div id="panePrestige" class="profile-pane hidden"></div>
+    </div>
+  </div>
+
+  <!-- OpenAds floating ad -->
+  <iframe class="openads-floating" src="https://api.openads.world/serve?publisher=0x3d915e82d079f410d99dc358221a0f6efd4446f1&placement=64x64-0x3d915e82d079f410d99dc358221a0f6efd4446f1&position=floating&parent_url=https%3A%2F%2Fcookie-clicker-hv5w.vercel.app%2F&app_id=f94fd2d9-6330-4026-b7cf-38cd99e49b44" title="Advertisement" width="64" height="64" style="display:none; position:fixed; top:20px; right:20px; width:64px; height:64px; border:none; border-radius:50%; z-index:999999;" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write"></iframe>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
