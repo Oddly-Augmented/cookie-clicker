@@ -323,8 +323,6 @@ const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('sh
 const quickNftBtn = $('quickNftBtn');
 const tabBtns    = document.querySelectorAll('.tab-btn');
 const orbits     = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
-const profileBtn = $('profileBtn');
-const paneNft    = $('paneNft');
 
 let activeTab = 'click'; // current shop tab
 
