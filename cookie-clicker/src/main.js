@@ -1,7 +1,7 @@
 import './style.css';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { createThirdwebClient, getContract, encode } from "thirdweb";
-import { claimTo } from "thirdweb/extensions/erc721";
+import { claimTo } from "thirdweb/extensions/erc1155";
 import { defineChain } from "thirdweb/chains";
 
 const thirdwebClient = createThirdwebClient({
@@ -345,6 +345,7 @@ window.buyGoldenNFT = async function() {
     const tx = claimTo({
       contract: nftContract,
       to: userAddress,
+      tokenId: 0n,
       quantity: 1n,
     });
     

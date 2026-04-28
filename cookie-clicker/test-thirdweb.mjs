@@ -1,5 +1,5 @@
 import { createThirdwebClient, getContract, encode } from "thirdweb";
-import { claimTo } from "thirdweb/extensions/erc721";
+import { claimTo } from "thirdweb/extensions/erc1155";
 import { defineChain } from "thirdweb/chains";
 
 const client = createThirdwebClient({
@@ -17,6 +17,7 @@ async function run() {
     const tx = claimTo({
       contract,
       to: "0x75A5E92a54336141f7a4d3E87eebF57E0Cf4239D", // dummy
+      tokenId: 0n,
       quantity: 1n,
     });
     
