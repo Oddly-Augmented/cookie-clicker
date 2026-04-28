@@ -633,17 +633,12 @@ async function openLeaderboard() {
     if (!data.length) {
       lbList.innerHTML = '<p class="lb-msg">No scores yet — be the first!</p>';
     } else {
-      lbList.innerHTML = data.map((row, i) => {
-        const prestBadge = row.prestige_level
-          ? `<span class="lb-plevel">🔝${row.prestige_level}</span>`
-          : '';
-        return `
+      lbList.innerHTML = data.map((row, i) => `
         <div class="lb-row">
           <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
-          <span class="lb-name">${escapeHtml(row.username)}${prestBadge}</span>
+          <span class="lb-name">${escapeHtml(row.username)}<span class="lb-plevel">🔝${row.prestige_level || 0}</span></span>
           <span class="lb-score">${fmt(row.score)}</span>
-        </div>`;
-      }).join('');
+        </div>`).join('');
     }
 
     // Footer line: where the player stands
