@@ -514,3 +514,11 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
 .prestige-item .info small { font-size: 0.7rem; opacity: 0.7; }
 .prestige-item .cost { font-size: 0.8rem; font-weight: 700; color: #b388ff; white-space: nowrap; }
 .prestige-item.bought .cost { color: #4caf50; }
+
+/* --- OpenAds floating ad: force bottom-right position --- */
+.openads-floating {
+  top: auto !important;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0)) !important;
+  right: 1rem !important;
+  left: auto !important;
+}
