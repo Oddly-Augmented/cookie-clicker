@@ -612,6 +612,8 @@ async function openProfile() {
   profileTabs.forEach(b => b.classList.toggle('active', b.dataset.ptab === 'leaderboard'));
   paneLeaderboard.classList.remove('hidden');
   paneAchievements.classList.add('hidden');
+  const panePrestige = $('panePrestige');
+  if (panePrestige) panePrestige.classList.add('hidden');
   profileTitle.textContent = '\uD83C\uDFC6 Leaderboard';
   renderAchievements(); // keep grid fresh in the background
   await openLeaderboard();
@@ -631,13 +633,17 @@ async function openLeaderboard() {
     if (!data.length) {
       lbList.innerHTML = '<p class="lb-msg">No scores yet — be the first!</p>';
     } else {
-      lbList.innerHTML = data.map((row, i) => `
+      lbList.innerHTML = data.map((row, i) => {
+        const prestBadge = row.prestige_level
+          ? `<span class="lb-plevel">🔝${row.prestige_level}</span>`
+          : '';
+        return `
         <div class="lb-row">
           <span class="lb-rank">${['🥇','🥈','🥉'][i] ?? `#${i + 1}`}</span>
-          <span class="lb-name">${escapeHtml(row.username)}</span>
-          <span class="lb-prestige">${row.ascensions ? `♾️ ${row.ascensions}` : ''}</span>
+          <span class="lb-name">${escapeHtml(row.username)}${prestBadge}</span>
           <span class="lb-score">${fmt(row.score)}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     // Footer line: where the player stands
@@ -646,9 +652,9 @@ async function openLeaderboard() {
       const me = data.find(r => r.fid === ctx.user.fid);
       if (me) {
         const rank = data.indexOf(me) + 1;
-        lbYou.textContent = `You're #${rank} with ${fmt(me.score)} all-time cookies (${me.ascensions || 0} ascensions)`;
+        lbYou.textContent = `#${rank} • ${fmt(me.score)} cookies • Prestige ${me.prestige_level || 0}`;
       } else {
-        lbYou.textContent = `Your score: ${fmt(state.lifetimeEarned)} (keep baking to crack the top 100)`;
+        lbYou.textContent = `${fmt(state.lifetimeEarned)} all-time cookies — keep baking!`;
       }
     } else {
       lbYou.textContent = 'Open in Farcaster to appear on the leaderboard.';
@@ -725,7 +731,10 @@ function renderPrestige() {
     </div>
     <div class="prestige-ascend-box">
       <p>Ascending resets cookies, buildings & upgrades but gives you <b>permanent CpS bonuses</b>.</p>
-      <p>You would earn <b>${newChips}</b> new prestige chip${newChips !== 1 ? 's' : ''} 💠</p>
+      ${newChips < 1
+        ? `<p>🔒 Requires <b>1B all-time cookies</b> to unlock. You have <b>${fmt(state.lifetimeEarned || 0)}</b> (${Math.min(100, ((state.lifetimeEarned || 0) / 1e9 * 100)).toFixed(2)}%).</p>`
+        : `<p>You would earn <b>${newChips}</b> new prestige chip${newChips !== 1 ? 's' : ''} 💠</p>`
+      }
       <button id="ascendBtn" class="ascend-btn" ${newChips < 1 ? 'disabled' : ''}>🔝 Ascend${newChips > 0 ? ` (+${newChips} chips)` : ''}</button>
     </div>
     <h3 style="margin-top:1rem">Prestige Shop</h3>

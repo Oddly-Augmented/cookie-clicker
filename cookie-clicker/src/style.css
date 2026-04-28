@@ -383,15 +383,19 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   min-height: 100px;
 }
 .lb-row {
-  display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.6rem 0;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .lb-row:last-child { border-bottom: none; }
-.lb-rank  { font-size: 1.1rem; width: 2.2rem; text-align: center; font-weight: 700; color: #7959FF; }
-.lb-name  { flex: 1; font-weight: 600; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-prestige { font-size: 0.85rem; color: #b388ff; font-weight: 600; min-width: 3rem; text-align: right; }
-.lb-score { font-weight: 800; color: #fff; }
+.lb-rank  { font-size: 1.1rem; width: 2rem; text-align: center; font-weight: 700; color: #7959FF; flex-shrink: 0; }
+.lb-name  { flex: 1; font-weight: 600; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 0.35rem; }
+.lb-plevel {
+  font-size: 0.7rem; font-weight: 700; color: #b388ff;
+  background: rgba(121, 89, 255, 0.15); padding: 0.1rem 0.35rem;
+  border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+}
+.lb-score { font-weight: 800; color: #fff; white-space: nowrap; flex-shrink: 0; }
 .lb-msg   { padding: 1.5rem 0; text-align: center; opacity: 0.6; font-size: 0.9rem; }
 
 .lb-you {
