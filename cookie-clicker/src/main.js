@@ -89,6 +89,8 @@ const ACHIEVEMENTS = [
   { id: 'sg',    need: 1_000_000, label: '1M CpS',        emoji: '⚡', kind: 'cps' },
   // Ad support
   { id: 'ad1',   need: 1,         label: 'Ad Supporter',  emoji: '📺', kind: 'adViews' },
+  // Social
+  { id: 'f1',    need: 1,         label: 'Follow odd',    emoji: '💜', kind: 'follow' },
 ];
 
 // ============================================================
@@ -560,6 +562,7 @@ function checkAchievements() {
     if (a.kind === 'ascensions') val = state.ascensions;
     if (a.kind === 'cps')        val = perSec();
     if (a.kind === 'adViews')    val = state.adViews || 0;
+    if (a.kind === 'follow')     val = state.unlocked.includes('f1') ? 1 : 0;
     if (val >= a.need) {
       state.unlocked.push(a.id);
       toast(a.emoji, 'Achievement: ' + a.label);
@@ -568,17 +571,39 @@ function checkAchievements() {
   }
 }
 
+window.followCreator = function() {
+  sdk.actions.openUrl('https://warpcast.com/oddlyaugmented');
+  if (!state.unlocked.includes('f1')) {
+    state.unlocked.push('f1');
+    saveState();
+    toast('💜', 'Achievement: Follow odd');
+    haptic('medium');
+    renderAchievements();
+  }
+};
+
 // Render the achievement grid with locked/unlocked states.
 function renderAchievements() {
   const count = state.unlocked.length;
   achProgress.textContent = `${count} / ${ACHIEVEMENTS.length}`;
   achList.innerHTML = ACHIEVEMENTS.map(a => {
     const unlocked = state.unlocked.includes(a.id);
+    let needText = '';
+    if (a.kind === 'cookies') needText = `${fmt(a.need)} cookies`;
+    else if (a.kind === 'clicks') needText = `${fmt(a.need)} clicks`;
+    else if (a.kind === 'buildings') needText = `${fmt(a.need)} buildings`;
+    else if (a.kind === 'tiers') needText = `${a.need} upgrades`;
+    else if (a.kind === 'ascensions') needText = `${a.need} ascensions`;
+    else if (a.kind === 'cps') needText = `${fmt(a.need)} CpS`;
+    else if (a.kind === 'adViews') needText = `Watch an ad`;
+    else if (a.kind === 'follow') needText = `Follow creator`;
+
+    const clickable = a.kind === 'follow' && !unlocked;
     return `
-      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
-        <span class="ach-emoji">${unlocked ? a.emoji : '\uD83D\uDD12'}</span>
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'} ${clickable ? 'clickable' : ''}" ${clickable ? 'onclick="followCreator()"' : ''}>
+        <span class="ach-emoji">${unlocked ? a.emoji : '🔒'}</span>
         <span class="ach-label">${a.label}</span>
-        <span class="ach-need">${fmt(a.need)} cookies</span>
+        <span class="ach-need">${needText}</span>
       </div>`;
   }).join('');
 }

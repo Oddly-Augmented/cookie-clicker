@@ -441,17 +441,39 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 .ach-card.unlocked {
   background: rgba(121, 89, 255, 0.15);
-  border-color: #7959FF;
+  border-color: rgba(121, 89, 255, 0.4);
   box-shadow: 0 4px 12px rgba(121, 89, 255, 0.2);
 }
-.ach-card.locked   { opacity: 0.45; filter: grayscale(0.9); }
-.ach-emoji  { font-size: 1.8rem; line-height: 1; }
-.ach-label  { font-size: 0.75rem; font-weight: 700; color: #fff; line-height: 1.2; }
-.ach-need   { font-size: 0.7rem; opacity: 0.6; font-weight: 600; color: #fff; }
+.ach-card.unlocked::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(121, 89, 255, 0.2) 0%, transparent 70%);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.ach-card.unlocked:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(121, 89, 255, 0.3);
+  border-color: rgba(121, 89, 255, 0.6);
+}
+.ach-card.unlocked:hover::before { opacity: 1; }
+
+.ach-card.locked { opacity: 0.45; filter: grayscale(0.9); }
+.ach-card.clickable { cursor: pointer; border-color: rgba(179, 136, 255, 0.5); }
+.ach-card.clickable:hover { 
+  background: rgba(179, 136, 255, 0.15); 
+  transform: translateY(-2px);
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+.ach-emoji  { font-size: 1.8rem; line-height: 1; z-index: 1; }
+.ach-label  { font-size: 0.75rem; font-weight: 700; color: #fff; line-height: 1.2; z-index: 1; }
+.ach-need   { font-size: 0.7rem; opacity: 0.6; font-weight: 600; color: #fff; z-index: 1; }
 
 @media (max-width: 380px) {
   .stage  { width: 280px; height: 280px; }
