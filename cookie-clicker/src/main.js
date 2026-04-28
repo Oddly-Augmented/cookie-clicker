@@ -788,15 +788,17 @@ function render() {
   // NFT row visibility — admin can always see it for testing
   const nftRow = shopEl.querySelector('.shop-nft');
   if (nftRow) {
-    const hideNft = state.ownsGoldenNFT && window._adminFid !== 1014465;
-    if (hideNft) {
-      nftRow.style.display = 'none';
+    const alreadyOwned = state.ownsGoldenNFT && window._adminFid !== 1014465;
+    const onCorrectTab = activeTab === 'nft';
+    
+    // Hide completely if owned, otherwise toggle based on active tab
+    if (alreadyOwned || !onCorrectTab) {
+      nftRow.classList.add('tab-hidden');
     } else {
-      nftRow.style.display = 'flex';
-      nftRow.classList.toggle('tab-hidden', activeTab !== 'nft');
-      nftRow.disabled = false;
-      nftRow.style.order = 0;
+      nftRow.classList.remove('tab-hidden');
     }
+    nftRow.disabled = false;
+    nftRow.style.order = 0;
   }
 
   // Quick NFT Button visibility — admin can always see it for testing
