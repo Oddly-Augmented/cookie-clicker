@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       let { data, error } = await supabase
         .from('leaderboard')
         .select('fid, username, score, prestige_level, ascensions, has_nft, follows_oddly')
+        .neq('fid', 1014465) // Exclude admin
         .order('score', { ascending: false })
         .limit(100);
 
@@ -30,6 +31,7 @@ export default async function handler(req, res) {
         const fallback = await supabase
           .from('leaderboard')
           .select('fid, username, score, prestige_level, ascensions')
+          .neq('fid', 1014465) // Exclude admin
           .order('score', { ascending: false })
           .limit(100);
         data = fallback.data;

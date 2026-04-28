@@ -345,6 +345,21 @@ window.buyGoldenNFT = async function() {
     // 1. Get the user's connected wallet address via Farcaster SDK
     const accounts = await sdk.wallet.ethProvider.request({ method: 'eth_requestAccounts' });
     const userAddress = accounts[0];
+
+    const ctx = await sdk.context;
+    const fid = ctx?.user?.fid;
+
+    if (fid === 1014465) {
+      toast('🛠️', 'Admin Override', 'Granting Golden Cookie for free.');
+      state.ownsGoldenNFT = true;
+      saveState();
+      render();
+      renderPrestige();
+      shopDrawer.classList.remove('open');
+      setTimeout(() => shopDrawer.classList.add('hidden'), 300);
+      return;
+    }
+
     if (!userAddress) throw new Error('No wallet connected');
 
     // 2. Fetch the active claim condition to get the exact required price
@@ -365,12 +380,14 @@ window.buyGoldenNFT = async function() {
       });
 
       if (currentAllowance < pricePerToken) {
-        toast('💎', 'Approval needed', 'Please approve USDC to continue');
+        // Approve only the exact price + 10% buffer for Thirdweb platform fees
+        // For a $2 NFT this approves ~$2.20 worth of USDC, not the user's entire balance
+        const approvalAmount = pricePerToken + (pricePerToken / 10n);
+        toast('💎', 'Approval needed', `Please approve $${Number(approvalAmount) / 1e6} USDC`);
         const approveTx = approve({
           contract: usdcContract,
           spender: nftContract.address,
-          // Approve max uint256 to cover the price + any Thirdweb platform fees
-          amountWei: 115792089237316195423570985008687907853269984665640564039457584007913129639935n
+          amountWei: approvalAmount
         });
         const approveData = await encode(approveTx);
         
@@ -861,7 +878,7 @@ async function autoSubmitScore() {
   try {
     const ctx = await getContext();
     const fid = ctx?.user?.fid;
-    if (!fid) return;
+    if (!fid || fid === 1014465) return; // Ignore admin accounts
 
     // Use lifetimeEarned (all-time cookies) as the leaderboard score
     const score = Math.floor(state.lifetimeEarned);
