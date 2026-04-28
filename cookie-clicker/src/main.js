@@ -334,11 +334,6 @@ function buy(u) {
 }
 
 window.buyGoldenNFT = async function() {
-  if (state.ownsGoldenNFT) {
-    toast('💎', 'You already own this NFT!');
-    return;
-  }
-  
   try {
     toast('💎', 'Connecting...', 'Requesting wallet address');
     
@@ -349,14 +344,9 @@ window.buyGoldenNFT = async function() {
     const ctx = await sdk.context;
     const fid = ctx?.user?.fid;
 
-    if (fid === 1014465) {
-      toast('🛠️', 'Admin Override', 'Granting Golden Cookie for free.');
-      state.ownsGoldenNFT = true;
-      saveState();
-      render();
-      renderPrestige();
-      shopDrawer.classList.remove('open');
-      setTimeout(() => shopDrawer.classList.add('hidden'), 300);
+    // Admin (Oddly) can always re-buy for testing purposes
+    if (fid !== 1014465 && state.ownsGoldenNFT) {
+      toast('💎', 'You already own this NFT!');
       return;
     }
 
