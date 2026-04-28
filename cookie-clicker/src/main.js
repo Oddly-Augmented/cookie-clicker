@@ -1,6 +1,18 @@
 import './style.css';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { encodeFunctionData } from 'viem';
+import { createThirdwebClient, getContract, encode } from "thirdweb";
+import { claimTo } from "thirdweb/extensions/erc721";
+import { defineChain } from "thirdweb/chains";
+
+const thirdwebClient = createThirdwebClient({
+  clientId: "24a76854b807bca33c794a450e4a69d7",
+});
+
+const nftContract = getContract({
+  client: thirdwebClient,
+  chain: defineChain(8453),
+  address: "0xB8a942d85A42b926C23B7f33A255b8DF384b15c8",
+});
 
 // ============================================================
 // Upgrade definitions
@@ -329,55 +341,28 @@ window.buyGoldenNFT = async function() {
 
     toast('💎', 'Check your Farcaster client to confirm...', 'Requesting transaction');
     
-    // 2. Encode the Thirdweb ERC721 Drop `claim` function
-    const claimAbi = [{
-      "inputs": [
-        { "internalType": "address", "name": "_receiver", "type": "address" },
-        { "internalType": "uint256", "name": "_quantity", "type": "uint256" },
-        { "internalType": "address", "name": "_currency", "type": "address" },
-        { "internalType": "uint256", "name": "_pricePerToken", "type": "uint256" },
-        {
-          "components": [
-            { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" },
-            { "internalType": "uint256", "name": "quantityLimitPerWallet", "type": "uint256" },
-            { "internalType": "uint256", "name": "pricePerToken", "type": "uint256" },
-            { "internalType": "address", "name": "currency", "type": "address" }
-          ],
-          "internalType": "struct IDrop.AllowlistProof",
-          "name": "_allowlistProof",
-          "type": "tuple"
-        },
-        { "internalType": "bytes", "name": "_data", "type": "bytes" }
-      ],
-      "name": "claim",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    }];
-
-    // Price is roughly 0.0006 ETH (~$2)
-    const priceInWei = 600000000000000n;
-    const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-
-    const data = encodeFunctionData({
-      abi: claimAbi,
-      functionName: 'claim',
-      args: [
-        userAddress, 
-        1n, // quantity
-        ETH_ADDRESS, // currency
-        priceInWei, // pricePerToken
-        { proof: [], quantityLimitPerWallet: 0n, pricePerToken: priceInWei, currency: ETH_ADDRESS }, // allowlistProof
-        '0x' // empty data
-      ]
+    // 2. Dynamically generate the claim transaction using Thirdweb
+    const tx = claimTo({
+      contract: nftContract,
+      to: userAddress,
+      quantity: 1n,
     });
+    
+    const data = await encode(tx);
+    
+    let priceInWei = 0n;
+    if (typeof tx.value === 'function') {
+      priceInWei = await tx.value();
+    } else if (tx.value !== undefined) {
+      priceInWei = await tx.value;
+    }
 
     // 3. Send the transaction via the native JSON-RPC provider on Base
     const result = await sdk.wallet.ethProvider.request({
       method: 'eth_sendTransaction',
       params: [{
-        to: '0xB8a942d85A42b926C23B7f33A255b8DF384b15c8',
-        value: '0x' + priceInWei.toString(16), // JSON-RPC requires hex strings
+        to: nftContract.address,
+        value: '0x' + priceInWei.toString(16),
         data: data
       }]
     });
