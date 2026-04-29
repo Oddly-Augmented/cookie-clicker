@@ -843,7 +843,6 @@ cookieBtn.addEventListener('click', (e) => {
   
   if (isCrit) {
     showCrit(e.clientX, e.clientY);
-    toast('⚡', 'CRIT!', `${fmt(gained)} cookies!`);
   }
   
   render();
