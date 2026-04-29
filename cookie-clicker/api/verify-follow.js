@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
-  const oddlyFid = '1014465';
+  const oddlyFid = String(process.env.ADMIN_FID || '1014465');
 
   try {
     const neynarRes = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${oddlyFid}&viewer_fid=${viewer_fid}`, {

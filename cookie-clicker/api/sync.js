@@ -1,4 +1,5 @@
 import { getSupabase } from './_supabase.js';
+import { verifyAuth } from './_auth.js';
 
 export default async function handler(req, res) {
   let supabase;
@@ -8,16 +9,19 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 
+  // Verify the Quick Auth JWT. From here on we trust only the FID
+  // from the token — never the fid from req.body or req.query.
+  const auth = await verifyAuth(req);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const authedFid = auth.fid;
+
   // GET: Load save state
   if (req.method === 'GET') {
-    const { fid } = req.query;
-    if (!fid) return res.status(400).json({ error: 'Missing fid' });
-
     try {
       const { data, error } = await supabase
         .from('saves')
         .select('state, updated_at')
-        .eq('fid', fid)
+        .eq('fid', authedFid)
         .maybeSingle();
 
       if (error) throw error;
@@ -30,12 +34,8 @@ export default async function handler(req, res) {
 
   // POST: Save state
   if (req.method === 'POST') {
-    const { fid, state } = req.body;
-    if (!fid || !state) return res.status(400).json({ error: 'Missing fid or state' });
-
-    // SECURITY NOTE: In a production app, you should verify the Quick Auth JWT 
-    // from the 'Authorization' header to ensure the request is actually from the user.
-    // For now, we are trusting the fid provided in the body.
+    const { state } = req.body || {};
+    if (!state) return res.status(400).json({ error: 'Missing state' });
 
     // Server-side sanitization: fix NaN/null/Infinity before saving
     const fix = (v, fallback = 0) => {
@@ -53,14 +53,14 @@ export default async function handler(req, res) {
         state.owned[key] = fix(state.owned[key]);
       }
     }
-    
+
     try {
       const { error } = await supabase
         .from('saves')
-        .upsert({ 
-          fid, 
-          state, 
-          updated_at: new Date().toISOString() 
+        .upsert({
+          fid: authedFid, // Use authenticated fid, not one from the body.
+          state,
+          updated_at: new Date().toISOString()
         }, { onConflict: 'fid' });
 
       if (error) throw error;

@@ -6,6 +6,7 @@
 // ============================================================
 
 import { getSupabase } from './_supabase.js';
+import { verifyAuth, ADMIN_FID } from './_auth.js';
 
 export default async function handler(req, res) {
   let supabase;
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
       let { data, error } = await supabase
         .from('leaderboard')
         .select('fid, username, score, prestige_level, ascensions, has_nft, follows_oddly')
-        .neq('fid', 1014465) // Exclude admin
+        .neq('fid', ADMIN_FID) // Exclude admin
         .order('score', { ascending: false })
         .limit(100);
 
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
         const fallback = await supabase
           .from('leaderboard')
           .select('fid, username, score, prestige_level, ascensions')
-          .neq('fid', 1014465) // Exclude admin
+          .neq('fid', ADMIN_FID) // Exclude admin
           .order('score', { ascending: false })
           .limit(100);
         data = fallback.data;
@@ -51,10 +52,15 @@ export default async function handler(req, res) {
 
   // ---- POST: submit score with prestige ----
   if (req.method === 'POST') {
+    // Verify the Quick Auth JWT. The fid we trust comes from the token.
+    const auth = await verifyAuth(req);
+    if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+    const fid = auth.fid;
+
     try {
-      const { fid, username, score, prestige_level, ascensions, has_nft, follows_oddly } = req.body || {};
-      if (!fid || typeof score !== 'number') {
-        return res.status(400).json({ error: 'fid and numeric score required' });
+      const { username, score, prestige_level, ascensions, has_nft, follows_oddly } = req.body || {};
+      if (typeof score !== 'number') {
+        return res.status(400).json({ error: 'Numeric score required' });
       }
       // Reject corrupted scores — NaN, Infinity, or absurdly high values
       if (!Number.isFinite(score) || score < 0 || score > 1e100) {

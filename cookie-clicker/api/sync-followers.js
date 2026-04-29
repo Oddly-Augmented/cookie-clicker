@@ -11,7 +11,7 @@
 
 import { getSupabase } from './_supabase.js';
 
-const ODDLY_FID = 1014465;
+const ODDLY_FID = Number(process.env.ADMIN_FID || 1014465);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

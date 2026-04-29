@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.1.10",
+    "@farcaster/quick-auth": "^0.0.8",
     "@supabase/supabase-js": "^2.45.0",
     "jimp": "^1.6.1",
     "thirdweb": "^5.119.4",
