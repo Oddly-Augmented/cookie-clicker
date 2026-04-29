@@ -43,7 +43,7 @@ const UPGRADES = [
   { id: 'singularity', name: 'Singularity', emoji: '✨', kind: 'cps', power: 100_000_000, baseCost: 5_000_000_000_000, orbit: 'outer' },
 ];
 
-const COST_MULTIPLIER = 1.15;
+const COST_MULTIPLIER = 1.18;
 const MAX_ORBIT = 8; // visual cap only
 
 // --- Tier upgrades (generated): each doubles a building's output ---
@@ -64,15 +64,15 @@ const TIER_UPGRADES = UPGRADES.flatMap(u =>
 // --- Prestige upgrades (persist across resets) ---
 // Repeatable upgrades — cost scales exponentially per level
 const PRESTIGE_REPEATABLE = [
-  { id: 'r_click', name: 'Click Protocol', emoji: '👆', baseCost: 1, scale: 1.5, desc: '+25% click power', effectPer: 0.25, cat: 'click' },
-  { id: 'r_passive', name: 'Yield Farming', emoji: '📈', baseCost: 1, scale: 1.5, desc: '+25% passive CpS', effectPer: 0.25, cat: 'passive' },
-  { id: 'r_golden', name: 'Lucky Algorithm', emoji: '🍀', baseCost: 2, scale: 1.8, desc: '+1× golden cookie multiplier', effectPer: 1, cat: 'golden' },
-  { id: 'r_daily', name: 'Compounding Interest', emoji: '🎁', baseCost: 2, scale: 1.8, desc: '+50% daily bonus', effectPer: 0.5, cat: 'daily' },
-  { id: 'r_offline', name: 'Sleep Mining', emoji: '😴', baseCost: 3, scale: 2.0, desc: '+10% offline production', effectPer: 0.10, cat: 'offline' },
-  { id: 'r_discount', name: 'Bulk Discount', emoji: '💸', baseCost: 3, scale: 2.0, desc: '-3% building costs (max −50%)', effectPer: 0.03, cat: 'economy', cap: 16 },
-  { id: 'r_crit', name: 'Overclock', emoji: '⚡', baseCost: 5, scale: 2.2, desc: '+5% crit chance & damage', effectPer: 0.05, cat: 'click' },
-  { id: 'r_starter', name: 'Trust Fund', emoji: '💰', baseCost: 5, scale: 2.5, desc: 'Start with 10× more cookies', effectPer: 10, cat: 'starter' },
-  { id: 'r_all', name: 'WAGMI Protocol', emoji: '🚀', baseCost: 10, scale: 2.5, desc: '+15% all production', effectPer: 0.15, cat: 'all' },
+  { id: 'r_click', name: 'Click Protocol', emoji: '👆', baseCost: 1, scale: 2.0, desc: '+25% click power', effectPer: 0.25, cat: 'click' },
+  { id: 'r_passive', name: 'Yield Farming', emoji: '📈', baseCost: 1, scale: 2.0, desc: '+25% passive CpS', effectPer: 0.25, cat: 'passive' },
+  { id: 'r_golden', name: 'Lucky Algorithm', emoji: '🍀', baseCost: 2, scale: 2.2, desc: '+1× golden cookie multiplier', effectPer: 1, cat: 'golden' },
+  { id: 'r_daily', name: 'Compounding Interest', emoji: '🎁', baseCost: 2, scale: 2.2, desc: '+50% daily bonus', effectPer: 0.5, cat: 'daily' },
+  { id: 'r_offline', name: 'Sleep Mining', emoji: '😴', baseCost: 3, scale: 2.5, desc: '+10% offline production', effectPer: 0.10, cat: 'offline' },
+  { id: 'r_discount', name: 'Bulk Discount', emoji: '💸', baseCost: 3, scale: 2.5, desc: '-3% building costs (max −50%)', effectPer: 0.03, cat: 'economy', cap: 16 },
+  { id: 'r_crit', name: 'Overclock', emoji: '⚡', baseCost: 5, scale: 2.8, desc: '+5% crit chance & damage', effectPer: 0.05, cat: 'click' },
+  { id: 'r_starter', name: 'Trust Fund', emoji: '💰', baseCost: 5, scale: 3.0, desc: 'Start with 10× more cookies', effectPer: 10, cat: 'starter' },
+  { id: 'r_all', name: 'WAGMI Protocol', emoji: '🚀', baseCost: 10, scale: 3.5, desc: '+15% all production', effectPer: 0.15, cat: 'all' },
 ];
 // One-time prestige upgrades — unique unlocks
 const PRESTIGE_ONETIME = [
@@ -332,7 +332,13 @@ const hasPrestige = id => (state.prestigeUpgrades || []).includes(id);
 
 // Global multipliers
 const milkMult = () => 1 + state.unlocked.length * 0.01;
-const prestigeMult = () => 1 + (state.prestigeLevel * 0.01) + (state.totalEarned / 1e9 * 0.05);
+const prestigeMult = () => {
+  // Use diminishing returns (power curve) for prestige levels
+  const levelBonus = Math.pow(state.prestigeLevel, 0.75) * 0.05;
+  // Use diminishing returns for the current run bonus
+  const runBonus = Math.pow(state.totalEarned / 1e9, 0.5) * 0.1;
+  return 1 + levelBonus + runBonus;
+};
 const clickPrestige = () => 1 + repLevel('r_click') * 0.25;
 const passivePrestige = () => 1 + repLevel('r_passive') * 0.25;
 const allPrestige = () => 1 + repLevel('r_all') * 0.15;
