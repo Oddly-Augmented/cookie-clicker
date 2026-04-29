@@ -36,6 +36,23 @@ export default async function handler(req, res) {
     // SECURITY NOTE: In a production app, you should verify the Quick Auth JWT 
     // from the 'Authorization' header to ensure the request is actually from the user.
     // For now, we are trusting the fid provided in the body.
+
+    // Server-side sanitization: fix NaN/null/Infinity before saving
+    const fix = (v, fallback = 0) => {
+      if (v === null || v === undefined || typeof v !== 'number' || !Number.isFinite(v)) return fallback;
+      return Math.min(v, 1e300);
+    };
+    state.cookies = fix(state.cookies);
+    state.totalEarned = fix(state.totalEarned);
+    state.lifetimeEarned = fix(state.lifetimeEarned);
+    state.prestigeLevel = fix(state.prestigeLevel);
+    state.prestigePoints = fix(state.prestigePoints);
+    state.totalClicks = fix(state.totalClicks);
+    if (state.owned && typeof state.owned === 'object') {
+      for (const key of Object.keys(state.owned)) {
+        state.owned[key] = fix(state.owned[key]);
+      }
+    }
     
     try {
       const { error } = await supabase
