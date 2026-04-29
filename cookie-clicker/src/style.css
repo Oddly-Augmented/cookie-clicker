@@ -252,7 +252,7 @@ h1 {
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
 }
 
-.fx-shoot {
+.fx-p-shoot {
   font-size: 1.5rem;
   line-height: 1.4rem;
 }
@@ -1579,3 +1579,4 @@ h1 {
   text-decoration: underline;
   opacity: 0.9;
 }
+@keyframes pulse-out { 0% { transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(var(--a)) translateY(180px) scale(2); opacity: 0; } } @keyframes fall { 0% { transform: translate(-50%, -50%) rotate(0deg) translateY(-180px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(0deg) translateY(180px); opacity: 0; } } @keyframes glitch { 0% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; transform: translate(-50%, -50%) rotate(var(--a)) translateY(100px) translate(2px, 0); } 50% { text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff; transform: translate(-50%, -50%) rotate(var(--a)) translateY(100px) translate(-2px, 0); } 100% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; transform: translate(-50%, -50%) rotate(var(--a)) translateY(100px) translate(2px, 0); } } @keyframes vortex { 0% { transform: translate(-50%, -50%) rotate(0deg) translateY(180px) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(720deg) translateY(0) scale(0.2); opacity: 0; } } .fx-p-pulse { text-shadow: 0 0 15px #7959FF; animation: pulse-out 1s ease-out forwards; } .fx-p-matrix { color: #00FF41; font-family: monospace; font-weight: bold; animation: fall 1.5s linear forwards; } .fx-p-glitch { color: #FF00FF; animation: glitch 0.5s steps(3) infinite, zap 0.5s ease-in forwards; } .fx-p-vortex { animation: vortex 2s linear forwards; }

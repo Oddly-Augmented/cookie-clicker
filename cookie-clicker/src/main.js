@@ -29,18 +29,22 @@ const UPGRADES = [
   { id: 'spoon', name: 'Auto-Liker', emoji: '💜', kind: 'click', power: 5, baseCost: 100, orbit: 'inner' },
   { id: 'whisk', name: 'Recast Engine', emoji: '🔁', kind: 'click', power: 25, baseCost: 1_500, orbit: 'inner' },
   { id: 'mixer', name: 'Based Node', emoji: '🔵', kind: 'click', power: 100, baseCost: 25_000, orbit: 'inner' },
+  { id: 'neural', name: 'Neural Link', emoji: '🧠', kind: 'click', power: 5_000, baseCost: 1_000_000, orbit: 'inner' },
+  { id: 'satellite', name: 'Satellite Laser', emoji: '🛰️', kind: 'click', power: 100_000, baseCost: 100_000_000, orbit: 'inner' },
+  { id: 'synthesizer', name: 'Matter Synth', emoji: '🧬', kind: 'click', power: 2_500_000, baseCost: 10_000_000_000, orbit: 'inner' },
+  { id: 'dimensional', name: 'Dimensional Clicker', emoji: '🌀', kind: 'click', power: 100_000_000, baseCost: 1_000_000_000_000, orbit: 'inner' },
   { id: 'grandma', name: 'Click Farm', emoji: '📱', kind: 'cps', power: 1, baseCost: 50, orbit: 'mid' },
   { id: 'farm', name: 'AI Clicker', emoji: '🧠', kind: 'cps', power: 5, baseCost: 500, orbit: 'mid' },
   { id: 'mine', name: 'Crypto Miner', emoji: '⛏️', kind: 'cps', power: 25, baseCost: 5_000, orbit: 'mid' },
   { id: 'factory', name: 'Meme Factory', emoji: '🐸', kind: 'cps', power: 100, baseCost: 50_000, orbit: 'mid' },
   { id: 'bank', name: 'DeFi Protocol', emoji: '🏦', kind: 'cps', power: 500, baseCost: 500_000, orbit: 'outer' },
-  { id: 'temple', name: 'Farcaster Hub', emoji: '🟣', kind: 'cps', power: 2_500, baseCost: 5_000_000, orbit: 'outer' },
+  { id: 'temple', name: 'Farcaster Hub', emoji: '🟣', kind: 'cps', power: 2_500, baseCost: 5_000_000, orbit: 'outer', fx: 'pulse' },
   { id: 'wizard', name: 'LLM Cluster', emoji: '🖥️', kind: 'cps', power: 12_500, baseCost: 50_000_000, orbit: 'outer', fx: 'shoot' },
   { id: 'rocket', name: 'AGI', emoji: '🌌', kind: 'cps', power: 60_000, baseCost: 500_000_000, orbit: 'outer' },
-  { id: 'quantum', name: 'Quantum Chain', emoji: '⚛️', kind: 'cps', power: 250_000, baseCost: 5_000_000_000, orbit: 'outer' },
+  { id: 'quantum', name: 'Quantum Chain', emoji: '⚛️', kind: 'cps', power: 250_000, baseCost: 5_000_000_000, orbit: 'outer', fx: 'matrix' },
   { id: 'dao', name: 'DAO Council', emoji: '🏛️', kind: 'cps', power: 1_500_000, baseCost: 50_000_000_000, orbit: 'outer' },
-  { id: 'meta', name: 'Metaverse', emoji: '🌐', kind: 'cps', power: 10_000_000, baseCost: 500_000_000_000, orbit: 'outer' },
-  { id: 'singularity', name: 'Singularity', emoji: '✨', kind: 'cps', power: 100_000_000, baseCost: 5_000_000_000_000, orbit: 'outer' },
+  { id: 'meta', name: 'Metaverse', emoji: '🌐', kind: 'cps', power: 10_000_000, baseCost: 500_000_000_000, orbit: 'outer', fx: 'glitch' },
+  { id: 'singularity', name: 'Singularity', emoji: '✨', kind: 'cps', power: 100_000_000, baseCost: 5_000_000_000_000, orbit: 'outer', fx: 'vortex' },
 ];
 
 const COST_MULTIPLIER = 1.18;
@@ -120,29 +124,57 @@ const ACHIEVEMENTS = [
   { id: 'c19', need: 1e63, label: 'Vigintillionaire', emoji: '🔮', kind: 'cookies' },
   { id: 'c20', need: 1e93, label: 'Trigintillionaire', emoji: '🧿', kind: 'cookies' },
   { id: 'c21', need: 1e123, label: 'Quadragintillionaire', emoji: '👑', kind: 'cookies' },
+  { id: 'c22', need: 1e150, label: 'Universe Eater', emoji: '🌌', kind: 'cookies' },
+  { id: 'c23', need: 1e200, label: 'Galaxy Brain', emoji: '🧠', kind: 'cookies' },
+  { id: 'c24', need: 1e250, label: 'Multiverse God', emoji: '🧿', kind: 'cookies' },
+  { id: 'c25', need: 1e300, label: 'Simulation Breaker', emoji: '♾️', kind: 'cookies' },
   // Click milestones
   { id: 'cl1', need: 100, label: '100 Clicks', emoji: '👆', kind: 'clicks' },
   { id: 'cl2', need: 1_000, label: '1K Clicks', emoji: '✋', kind: 'clicks' },
   { id: 'cl3', need: 10_000, label: '10K Clicks', emoji: '💪', kind: 'clicks' },
   { id: 'cl4', need: 100_000, label: '100K Clicks', emoji: '🤖', kind: 'clicks' },
+  { id: 'cl5', need: 250_000, label: 'Quarter-Million Clicks', emoji: '🧤', kind: 'clicks' },
+  { id: 'cl6', need: 500_000, label: 'Half-Million Clicks', emoji: '🥊', kind: 'clicks' },
+  { id: 'cl7', need: 1_000_000, label: 'Million-Click Master', emoji: '🔨', kind: 'clicks' },
   // Building milestones
   { id: 'b1', need: 1, label: 'First Purchase', emoji: '📝', kind: 'buildings' },
   { id: 'b2', need: 10, label: '10 Buildings', emoji: '🏗️', kind: 'buildings' },
   { id: 'b3', need: 50, label: '50 Buildings', emoji: '🏢', kind: 'buildings' },
   { id: 'b4', need: 100, label: '100 Buildings', emoji: '🏙️', kind: 'buildings' },
   { id: 'b5', need: 200, label: '200 Buildings', emoji: '🌆', kind: 'buildings' },
+  { id: 'b6', need: 500, label: 'City Planner', emoji: '🌃', kind: 'buildings' },
+  { id: 'b7', need: 1000, label: 'Empire Builder', emoji: '🏰', kind: 'buildings' },
+  { id: 'b8', need: 2500, label: 'Galactic Architect', emoji: '🪐', kind: 'buildings' },
   // Tier milestones
   { id: 't1', need: 1, label: 'First Upgrade', emoji: '⬆️', kind: 'tiers' },
   { id: 't2', need: 10, label: '10 Upgrades', emoji: '🔧', kind: 'tiers' },
   { id: 't3', need: 25, label: '25 Upgrades', emoji: '⚙️', kind: 'tiers' },
+  { id: 't4', need: 50, label: '50 Upgrades', emoji: '⚒️', kind: 'tiers' },
+  { id: 't5', need: 100, label: '100 Upgrades', emoji: '🚀', kind: 'tiers' },
   // Prestige milestones
   { id: 'p1', need: 1, label: 'First Prestige', emoji: '🔝', kind: 'ascensions' },
   { id: 'p2', need: 3, label: 'Triple Prestige', emoji: '♾️', kind: 'ascensions' },
   { id: 'p3', need: 10, label: 'Prestige Master', emoji: '🌠', kind: 'ascensions' },
+  { id: 'p4', need: 25, label: 'Ascension Addict', emoji: '🌀', kind: 'ascensions' },
+  { id: 'p5', need: 50, label: 'Half-Century Resets', emoji: '🔄', kind: 'ascensions' },
+  { id: 'p6', need: 100, label: 'Century of Growth', emoji: '💯', kind: 'ascensions' },
+  // Prestige Level (New kind)
+  { id: 'pl1', need: 1000, label: 'Prestige Elite', emoji: '🎖️', kind: 'prestige_level' },
+  { id: 'pl2', need: 5000, label: 'The 5K Club', emoji: '🔰', kind: 'prestige_level' },
+  { id: 'pl3', need: 10000, label: 'High Roller', emoji: '🔱', kind: 'prestige_level' },
+  { id: 'pl4', need: 25000, label: 'Infinity Bound', emoji: '🎇', kind: 'prestige_level' },
   // Special
   { id: 'sg', need: 1_000_000, label: '1M CpS', emoji: '⚡', kind: 'cps' },
+  { id: 'sg2', need: 1e12, label: 'Tera-CpS', emoji: '🔥', kind: 'cps' },
+  { id: 'sg3', need: 1e18, label: 'Exa-CpS', emoji: '💥', kind: 'cps' },
   // Ad support
   { id: 'ad1', need: 1, label: 'Ad Supporter', emoji: '📺', kind: 'adViews' },
+  // Shadow Achievements (Hidden until unlocked)
+  { id: 's1', need: 1, label: 'The Collector', emoji: '🏢', kind: 'collector', shadow: true },
+  { id: 's2', need: 10, label: 'Speed Demon', emoji: '⚡', kind: 'speed', shadow: true },
+  { id: 's3', need: 1, label: 'Patience is a Virtue', emoji: '🧘', kind: 'idle_long', shadow: true },
+  { id: 's4', need: 1, label: 'Lucky Strike', emoji: '🎯', kind: 'golden_fast', shadow: true },
+  { id: 's5', need: 100, label: 'Ascended Being', emoji: '🌌', kind: 'high_prestige', shadow: true },
 ];
 
 // ============================================================
@@ -460,6 +492,12 @@ const tabBtns = document.querySelectorAll('.tab-btn');
 const orbits = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
 
 let activeTab = 'click'; // current shop tab
+let clicksInLastSecond = 0;
+let lastClickTime = Date.now();
+let lastGoldenSpawnTime = 0;
+let sessionStartTime = Date.now();
+let particleCount = 0;
+const MAX_PARTICLES = 50;
 
 // ============================================================
 // Toasts
@@ -739,13 +777,28 @@ function renderOrbits() {
   }
 }
 function spawnSparkle() {
-  if (state.owned.wizard <= 0) return;
-  const s = document.createElement('span');
-  s.className = 'sparkle';
-  s.textContent = '✨';
-  s.style.setProperty('--a', `${Math.random() * 360}deg`);
-  fxEl.appendChild(s);
-  s.addEventListener('animationend', () => s.remove());
+  const fxBuildings = UPGRADES.filter(u => u.fx && state.owned[u.id] > 0);
+  if (fxBuildings.length === 0) return;
+
+  fxBuildings.forEach(u => {
+    // Probability of spawning based on building count (cap at 10% chance per tick per building)
+    const chance = Math.min(0.1, state.owned[u.id] * 0.01);
+    if (Math.random() > chance) return;
+    if (particleCount >= MAX_PARTICLES) return;
+
+    const s = document.createElement('span');
+    s.className = `sparkle fx-p-${u.fx}`;
+    s.textContent = u.fx === 'matrix' ? (Math.random() > 0.5 ? '0' : '1') : (u.fx === 'glitch' ? '■' : '✨');
+    s.style.setProperty('--a', `${Math.random() * 360}deg`);
+    
+    fxEl.appendChild(s);
+    particleCount++;
+
+    s.addEventListener('animationend', () => {
+      s.remove();
+      particleCount--;
+    });
+  });
 }
 
 // ============================================================
@@ -766,6 +819,7 @@ function showGoldenCookie() {
   gc.style.left = `${15 + Math.random() * 70}%`;
   gc.style.top = `${20 + Math.random() * 60}%`;
   document.body.appendChild(gc);
+  lastGoldenSpawnTime = Date.now();
 
   const expire = setTimeout(() => {
     gc.classList.add('fade-out');
@@ -774,12 +828,19 @@ function showGoldenCookie() {
   }, 15_000);
 
   gc.addEventListener('click', () => {
+    window._lastGcReaction = Date.now() - lastGoldenSpawnTime;
     clearTimeout(expire);
     gc.classList.add('fade-out');
     setTimeout(() => gc.remove(), 300);
     activateBonus();
+    checkAchievements();
   });
 }
+
+// Reset click speed tracker every second
+setInterval(() => {
+  clicksInLastSecond = 0;
+}, 1000);
 
 function activateBonus() {
   bonusActive = true;
@@ -878,6 +939,8 @@ cookieBtn.addEventListener('click', (e) => {
   state.totalEarned += gained;
   state.lifetimeEarned += gained;
   state.totalClicks += 1;
+  clicksInLastSecond++;
+  lastClickTime = Date.now();
   haptic(isCrit ? 'heavy' : 'light');
   cookieBtn.classList.remove('pop');
   void cookieBtn.offsetWidth;
@@ -1041,6 +1104,19 @@ function checkAchievements() {
     if (a.kind === 'cps') val = perSec();
     if (a.kind === 'adViews') val = state.adViews || 0;
     if (a.kind === 'follow') val = state.unlocked.includes('f1') ? 1 : 0;
+    if (a.kind === 'prestige_level') val = state.prestigeLevel;
+    
+    // Shadow kinds
+    if (a.kind === 'collector') val = Object.values(state.owned).every(n => n > 0) ? 1 : 0;
+    if (a.kind === 'speed') val = clicksInLastSecond;
+    if (a.kind === 'idle_long') val = (Date.now() - lastClickTime >= 3600000 && Date.now() - sessionStartTime >= 3600000) ? 1 : 0;
+    if (a.kind === 'golden_fast') {
+      // Handled in GC click listener, but we can set a flag or check reaction here if we stored it
+      // Let's just check if the last GC was fast. We need to store that.
+      val = (window._lastGcReaction < 1000) ? 1 : 0;
+    }
+    if (a.kind === 'high_prestige') val = state.prestigeLevel;
+
     if (val >= a.need) {
       state.unlocked.push(a.id);
       toast(a.emoji, 'Achievement: ' + a.label);
@@ -1074,8 +1150,12 @@ function renderAchievements() {
     else if (a.kind === 'tiers') needText = `${a.need} upgrades`;
     else if (a.kind === 'ascensions') needText = `${a.need} ascensions`;
     else if (a.kind === 'cps') needText = `${fmt(a.need)} CpS`;
+    else if (a.kind === 'prestige_level') needText = `Prestige Lv.${a.need}`;
     else if (a.kind === 'adViews') needText = `Watch an ad`;
     else if (a.kind === 'follow') needText = `Follow creator (+10% Boost!)`;
+    else if (a.shadow) needText = `??? (Hidden Achievement)`;
+
+    if (a.shadow && !unlocked) return ''; // Hide shadow achievements if not unlocked
 
     const clickable = a.kind === 'follow' && !unlocked;
     return `
