@@ -275,6 +275,15 @@ function loadState() {
       saved.followsOddly = saved.followsOddly ?? false;
       // Run prestige migration
       saved = migratePrestigeV2(saved);
+
+      // Heal corrupted saves: fix NaN/Infinity from previous overflow bugs
+      const fix = (v, fallback = 0) => (Number.isFinite(v) ? Math.min(v, 1e300) : fallback);
+      saved.cookies = fix(saved.cookies);
+      saved.totalEarned = fix(saved.totalEarned);
+      saved.lifetimeEarned = fix(saved.lifetimeEarned);
+      saved.prestigeLevel = fix(saved.prestigeLevel);
+      saved.prestigePoints = fix(saved.prestigePoints);
+
       return saved;
     }
     const migrated = migrateV1();
@@ -1062,10 +1071,12 @@ function render() {
   const pInfo = $('prestigeInfo');
   if (pInfo) {
     if (state.prestigeLevel > 0 || calcPrestigeGain() >= 1) {
-      const bonus = ((prestigeMult() - 1) * 100).toFixed(1);
+      const rawBonus = (prestigeMult() - 1) * 100;
+      const bonus = isFinite(rawBonus) ? rawBonus.toFixed(1) : '0.0';
       const nextPt = nextPrestigeAt();
-      const progress = state.totalEarned / nextPt * 100;
-      pInfo.textContent = `⭐ Prestige Lv.${state.prestigeLevel} (+${bonus}%) · Next: ${fmt(state.totalEarned)}/${fmt(nextPt)} (${Math.min(99, progress).toFixed(0)}%)`;
+      const rawProgress = nextPt > 0 ? (state.totalEarned / nextPt * 100) : 0;
+      const progress = isFinite(rawProgress) ? Math.min(99, rawProgress).toFixed(0) : '0';
+      pInfo.textContent = `⭐ Prestige Lv.${state.prestigeLevel} (+${bonus}%) · Next: ${fmt(state.totalEarned)}/${fmt(nextPt)} (${progress}%)`;
       pInfo.classList.remove('hidden');
     } else {
       pInfo.classList.add('hidden');
