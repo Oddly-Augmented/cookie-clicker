@@ -393,7 +393,14 @@ const prestigeMult = () => {
   // Use diminishing returns (power curve) for prestige levels
   const levelBonus = Math.pow(state.prestigeLevel, 0.75) * 0.05;
   // Use diminishing returns for the current run bonus
-  const runBonus = Math.pow(state.totalEarned / 1e9, 0.5) * 0.1;
+  // Switch to log scaling beyond 1 Quadrillion to prevent runaway growth
+  const rawRunValue = state.totalEarned / 1e9;
+  let runBonus;
+  if (rawRunValue > 1e6) {
+    runBonus = (Math.pow(1e6, 0.5) * 0.1) + (Math.log10(rawRunValue / 1e6) * 5);
+  } else {
+    runBonus = Math.pow(rawRunValue, 0.5) * 0.1;
+  }
   return 1 + levelBonus + runBonus;
 };
 const clickPrestige = () => 1 + repLevel('r_click') * 0.25;
@@ -416,7 +423,7 @@ const endgameMult = () => {
   return m;
 };
 const nftMult = () => state.ownsGoldenNFT ? 2 : 1;
-const globalMult = () => milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult() * endgameMult();
+const globalMult = () => Math.min(milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult() * endgameMult(), 1e50);
 
 const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
 const adBoostMult = () => adBoostActive() ? 1.5 : 1;
@@ -457,9 +464,22 @@ const offlineRate = () => {
 const dailyMult = () => 1 + repLevel('r_daily') * 0.5;
 
 const fmt = n => {
-  if (!Number.isFinite(n)) return "Infinity";
+  if (n === undefined || n === null || isNaN(n)) return '0';
+  if (!Number.isFinite(n)) return '∞';
   if (n < 1000) return Math.floor(n).toString();
-  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Un', 'Du', 'Tr', 'QaD', 'QiD', 'SxD', 'SpD', 'OcD', 'NoD', 'Vg', 'UnV', 'Dvg', 'Tvg', 'Qav', 'Qivg', 'Sxvg', 'Spvg', 'Ovg', 'Nvg', 'Tg', 'Utg', 'Dtg', 'Ttg', 'Qatg', 'Qitg', 'Sxtg', 'Sptg', 'Octg', 'Notg', 'Qd'];
+  const units = [
+    'K','M','B','T','Qa','Qi','Sx','Sp','Oc','No',         // 10^3 – 10^30
+    'Dc','UDc','DDc','TDc','QaDc','QiDc','SxDc','SpDc','OcDc','NoDc', // 10^33 – 10^60
+    'Vg','UVg','DVg','TVg','QaVg','QiVg','SxVg','SpVg','OcVg','NoVg', // 10^63 – 10^90
+    'Tg','UTg','DTg','TTg','QaTg','QiTg','SxTg','SpTg','OcTg','NoTg', // 10^93 – 10^120
+    'Qag','UQag','DQag','TQag','QaQag','QiQag','SxQag','SpQag','OcQag','NoQag', // 10^123 – 10^150
+    'Qig','UQig','DQig','TQig','QaQig','QiQig','SxQig','SpQig','OcQig','NoQig', // 10^153 – 10^180
+    'Sxg','USxg','DSxg','TSxg','QaSxg','QiSxg','SxSxg','SpSxg','OcSxg','NoSxg', // 10^183 – 10^210
+    'Spg','USpg','DSpg','TSpg','QaSpg','QiSpg','SxSpg','SpSpg','OcSpg','NoSpg', // 10^213 – 10^240
+    'Ocg','UOcg','DOcg','TOcg','QaOcg','QiOcg','SxOcg','SpOcg','OcOcg','NoOcg', // 10^243 – 10^270
+    'Nog','UNog','DNog','TNog','QaNog','QiNog','SxNog','SpNog','OcNog','NoNog', // 10^273 – 10^300
+    'Ce'  // 10^303
+  ];
   const unitIndex = Math.floor(Math.log10(n) / 3) - 1;
   if (unitIndex < 0) return Math.floor(n).toString();
   if (unitIndex >= units.length) return n.toExponential(2);
