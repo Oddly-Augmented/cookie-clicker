@@ -283,6 +283,13 @@ function loadState() {
       saved.lifetimeEarned = fix(saved.lifetimeEarned);
       saved.prestigeLevel = fix(saved.prestigeLevel);
       saved.prestigePoints = fix(saved.prestigePoints);
+      saved.totalClicks = fix(saved.totalClicks);
+      // Fix corrupted building counts — NaN owned values break perClick/perSec
+      if (saved.owned && typeof saved.owned === 'object') {
+        for (const key of Object.keys(saved.owned)) {
+          saved.owned[key] = fix(saved.owned[key]);
+        }
+      }
 
       return saved;
     }
