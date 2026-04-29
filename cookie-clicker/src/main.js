@@ -109,6 +109,17 @@ const ACHIEVEMENTS = [
   { id: 'c8', need: 100_000_000, label: 'Centimillionaire', emoji: '🌕', kind: 'cookies' },
   { id: 'c9', need: 1_000_000_000, label: 'Billionaire', emoji: '👑', kind: 'cookies' },
   { id: 'c10', need: 100_000_000_000, label: 'Cookie Whale', emoji: '🐋', kind: 'cookies' },
+  { id: 'c11', need: 1e12, label: 'Trillionaire', emoji: '🏆', kind: 'cookies' },
+  { id: 'c12', need: 1e15, label: 'Quadrillionaire', emoji: '💰', kind: 'cookies' },
+  { id: 'c13', need: 1e18, label: 'Quintillionaire', emoji: '💎', kind: 'cookies' },
+  { id: 'c14', need: 1e21, label: 'Sextillionaire', emoji: '🌟', kind: 'cookies' },
+  { id: 'c15', need: 1e24, label: 'Septillionaire', emoji: '🌈', kind: 'cookies' },
+  { id: 'c16', need: 1e27, label: 'Octillionaire', emoji: '🌌', kind: 'cookies' },
+  { id: 'c17', need: 1e30, label: 'Nonillionaire', emoji: '🌠', kind: 'cookies' },
+  { id: 'c18', need: 1e33, label: 'Decillionaire', emoji: '🪐', kind: 'cookies' },
+  { id: 'c19', need: 1e63, label: 'Vigintillionaire', emoji: '🔮', kind: 'cookies' },
+  { id: 'c20', need: 1e93, label: 'Trigintillionaire', emoji: '🧿', kind: 'cookies' },
+  { id: 'c21', need: 1e123, label: 'Quadragintillionaire', emoji: '👑', kind: 'cookies' },
   // Click milestones
   { id: 'cl1', need: 100, label: '100 Clicks', emoji: '👆', kind: 'clicks' },
   { id: 'cl2', need: 1_000, label: '1K Clicks', emoji: '✋', kind: 'clicks' },
@@ -411,11 +422,15 @@ const offlineRate = () => {
 const dailyMult = () => 1 + repLevel('r_daily') * 0.5;
 
 const fmt = n => {
-  if (n < 1_000) return Math.floor(n).toString();
-  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi'];
-  let i = -1;
-  while (n >= 1_000 && i < units.length - 1) { n /= 1_000; i++; }
-  return n.toFixed(n < 10 ? 2 : n < 100 ? 1 : 0) + units[i];
+  if (!Number.isFinite(n)) return "Infinity";
+  if (n < 1000) return Math.floor(n).toString();
+  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Un', 'Du', 'Tr', 'QaD', 'QiD', 'SxD', 'SpD', 'OcD', 'NoD', 'Vg', 'UnV', 'Dvg', 'Tvg', 'Qav', 'Qivg', 'Sxvg', 'Spvg', 'Ovg', 'Nvg', 'Tg', 'Utg', 'Dtg', 'Ttg', 'Qatg', 'Qitg', 'Sxtg', 'Sptg', 'Octg', 'Notg', 'Qd'];
+  const unitIndex = Math.floor(Math.log10(n) / 3) - 1;
+  if (unitIndex < 0) return Math.floor(n).toString();
+  if (unitIndex >= units.length) return n.toExponential(2);
+  const unitValue = Math.pow(10, (unitIndex + 1) * 3);
+  const num = n / unitValue;
+  return num.toFixed(num < 10 ? 2 : num < 100 ? 1 : 0) + units[unitIndex];
 };
 
 // ============================================================
