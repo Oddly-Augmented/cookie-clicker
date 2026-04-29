@@ -355,6 +355,20 @@ async function loadFromCloud() {
 
     const cloudState = data.state;
 
+    // Sanitize cloud state — it may contain NaN/Infinity from the overflow bug
+    const fix = (v, fallback = 0) => (Number.isFinite(v) ? Math.min(v, 1e300) : fallback);
+    cloudState.cookies = fix(cloudState.cookies);
+    cloudState.totalEarned = fix(cloudState.totalEarned);
+    cloudState.lifetimeEarned = fix(cloudState.lifetimeEarned);
+    cloudState.prestigeLevel = fix(cloudState.prestigeLevel);
+    cloudState.prestigePoints = fix(cloudState.prestigePoints);
+    cloudState.totalClicks = fix(cloudState.totalClicks);
+    if (cloudState.owned && typeof cloudState.owned === 'object') {
+      for (const key of Object.keys(cloudState.owned)) {
+        cloudState.owned[key] = fix(cloudState.owned[key]);
+      }
+    }
+
     // Simple conflict resolution: Cloud wins if it has more lifetime cookies
     // or if the local save is non-existent.
     const cloudCookies = cloudState.lifetimeEarned || 0;
