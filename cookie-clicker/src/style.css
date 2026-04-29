@@ -1472,3 +1472,9 @@ h1 {
     transform: translate(-50%, -60px) scale(1);
   }
 }
+
+.whale-badge {
+  color: #FFD700 !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  font-weight: 800;
+}

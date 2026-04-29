@@ -87,6 +87,12 @@ const PRESTIGE_ONETIME = [
   { id: 'ot_prestige_slot', name: 'Permanent Upgrade Slot', emoji: '📌', cost: 20, desc: 'Keep 1 tier upgrade through prestige resets' },
   { id: 'ot_milestone_1', name: "Billionaire's Club", emoji: '👑', cost: 25, desc: 'All production +50% (requires 10B lifetime)' },
   { id: 'ot_milestone_2', name: 'Trillion Toast', emoji: '🏆', cost: 50, desc: 'All production +100% (requires 1T lifetime)' },
+  // Endgame Sinks
+  { id: 'ot_degen', name: 'Degen Protocol', emoji: '🎰', cost: 1_000_000, desc: 'A badge of honor for the truly Based. (+1% production)' },
+  { id: 'ot_whale_status', name: 'Whale Status', emoji: '🐳', cost: 5_000_000, desc: 'Your prestige level badge turns Golden. (Cosmetic)' },
+  { id: 'ot_singularity', name: 'The Singularity', emoji: '✨', cost: 10_000_000, desc: '+0.1% production per trillion lifetime cookies.' },
+  { id: 'ot_dimensional', name: 'Dimensional Shift', emoji: '🌀', cost: 25_000_000, desc: 'Golden cookies stay on screen 5s longer.' },
+  { id: 'ot_god_mode', name: 'Cookie God', emoji: '👑', cost: 100_000_000, desc: 'The ultimate endgame goal. (+5% production)' },
 ];
 
 const ACHIEVEMENTS = [
@@ -348,8 +354,18 @@ const milestoneMult = () => {
   if (hasPrestige('ot_milestone_2') && state.lifetimeEarned >= 1e12) m += 1.0;
   return m;
 };
+const endgameMult = () => {
+  let m = 1;
+  if (hasPrestige('ot_degen')) m += 0.01;
+  if (hasPrestige('ot_god_mode')) m += 0.05;
+  if (hasPrestige('ot_singularity')) {
+    // 0.1% per 1T cookies
+    m += (state.lifetimeEarned / 1e12) * 0.001;
+  }
+  return m;
+};
 const nftMult = () => state.ownsGoldenNFT ? 2 : 1;
-const globalMult = () => milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult();
+const globalMult = () => milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult() * endgameMult();
 
 const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
 const adBoostMult = () => adBoostActive() ? 1.5 : 1;
@@ -749,7 +765,7 @@ function activateBonus() {
   bonusActive = true;
   clearInterval(bonusBarInterval);
 
-  const DURATION = 30_000;
+  const DURATION = hasPrestige('ot_dimensional') ? 35_000 : 30_000;
   const end = Date.now() + DURATION;
   bonusBar.classList.add('active');
   bonusProgress.style.width = '100%';
@@ -1129,7 +1145,8 @@ async function autoSubmitScore() {
         prestige_level: state.prestigeLevel || 0,
         ascensions: state.ascensions || 0,
         has_nft: state.ownsGoldenNFT || false,
-        follows_oddly: state.followsOddly || false
+        follows_oddly: state.followsOddly || false,
+        has_whale: hasPrestige('ot_whale_status')
       })
     });
     if (r.ok) {
@@ -1221,7 +1238,7 @@ function renderUserStats() {
     </div>
     <div class="user-stat-row">
       <span class="user-stat-label">Prestige Level</span>
-      <span class="user-stat-value">${state.prestigeLevel}</span>
+      <span class="user-stat-value ${hasPrestige('ot_whale_status') ? 'whale-badge' : ''}">${state.prestigeLevel}</span>
     </div>
     <div class="user-stat-row">
       <span class="user-stat-label">Ascensions</span>
@@ -1290,7 +1307,7 @@ async function openLeaderboard() {
           <span class="lb-rank">${['🥇', '🥈', '🥉'][i] ?? `#${i + 1}`}</span>
           <span class="lb-name-row">
             <span class="lb-name-text ${isGolden ? 'golden' : ''}">${escapeHtml(displayName)}</span>
-            <span class="lb-plevel">🔝${row.prestige_level || 0}</span>
+            <span class="lb-plevel ${row.has_whale ? 'whale-badge' : ''}">🔝${row.prestige_level || 0}</span>
           </span>
           <span class="lb-score">${fmt(row.score)}</span>
         </div>`;
