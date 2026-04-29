@@ -403,41 +403,55 @@ const cost = u => {
 };
 
 // Multiplier from tier upgrades for a building
-const tierMult = uid => Math.pow(2, TIER_UPGRADES.filter(t => t.buildingId === uid && state.tiersBought.includes(t.id)).length);
+const tierMult = uid => {
+  const bought = Array.isArray(state.tiersBought) ? state.tiersBought : [];
+  return Math.pow(2, TIER_UPGRADES.filter(t => t.buildingId === uid && bought.includes(t.id)).length);
+};
 
 // --- Prestige helper functions ---
-const repLevel = id => state.prestigeRepeatables?.[id] || 0;
+const repLevel = id => {
+  const v = state.prestigeRepeatables?.[id];
+  return (typeof v === 'number' && Number.isFinite(v)) ? v : 0;
+};
 const repCost = pu => Math.ceil(pu.baseCost * Math.pow(pu.scale, repLevel(pu.id)));
 const hasPrestige = id => (state.prestigeUpgrades || []).includes(id);
 
+// safeNum: returns the number if finite, otherwise the fallback.
+// Guards every multiplier so a single bad save field can't NaN-cascade and zero out clicks.
+const safeNum = (v, fallback = 0) => (typeof v === 'number' && Number.isFinite(v)) ? v : fallback;
+
 // Global multipliers
 const milkMult = () => {
-  let m = 1 + state.unlocked.length * 0.01;
+  const unlocked = Array.isArray(state.unlocked) ? state.unlocked : [];
+  let m = 1 + unlocked.length * 0.01;
   // Meaningful reward: 1.1x total production for following
-  if (state.unlocked.includes('f1')) m *= 1.10;
-  return m;
+  if (unlocked.includes('f1')) m *= 1.10;
+  return safeNum(m, 1);
 };
 const prestigeMult = () => {
+  const pLevel = safeNum(state.prestigeLevel, 0);
+  const totalEarned = safeNum(state.totalEarned, 0);
   // Use diminishing returns (power curve) for prestige levels
-  const levelBonus = Math.pow(state.prestigeLevel, 0.75) * 0.05;
+  const levelBonus = Math.pow(Math.max(0, pLevel), 0.75) * 0.05;
   // Use diminishing returns for the current run bonus
   // Switch to log scaling beyond 1 Quadrillion to prevent runaway growth
-  const rawRunValue = state.totalEarned / 1e9;
+  const rawRunValue = Math.max(0, totalEarned / 1e9);
   let runBonus;
   if (rawRunValue > 1e6) {
     runBonus = (Math.pow(1e6, 0.5) * 0.1) + (Math.log10(rawRunValue / 1e6) * 5);
   } else {
     runBonus = Math.pow(rawRunValue, 0.5) * 0.1;
   }
-  return 1 + levelBonus + runBonus;
+  return safeNum(1 + levelBonus + runBonus, 1);
 };
-const clickPrestige = () => 1 + repLevel('r_click') * 0.25;
-const passivePrestige = () => 1 + repLevel('r_passive') * 0.25;
-const allPrestige = () => 1 + repLevel('r_all') * 0.15;
+const clickPrestige = () => safeNum(1 + repLevel('r_click') * 0.25, 1);
+const passivePrestige = () => safeNum(1 + repLevel('r_passive') * 0.25, 1);
+const allPrestige = () => safeNum(1 + repLevel('r_all') * 0.15, 1);
 const milestoneMult = () => {
+  const lifetime = safeNum(state.lifetimeEarned, 0);
   let m = 1;
-  if (hasPrestige('ot_milestone_1') && state.lifetimeEarned >= 10e9) m += 0.5;
-  if (hasPrestige('ot_milestone_2') && state.lifetimeEarned >= 1e12) m += 1.0;
+  if (hasPrestige('ot_milestone_1') && lifetime >= 10e9) m += 0.5;
+  if (hasPrestige('ot_milestone_2') && lifetime >= 1e12) m += 1.0;
   return m;
 };
 const endgameMult = () => {
@@ -445,13 +459,16 @@ const endgameMult = () => {
   if (hasPrestige('ot_degen')) m += 0.01;
   if (hasPrestige('ot_god_mode')) m += 0.05;
   if (hasPrestige('ot_singularity')) {
-    // 0.1% per 1T cookies
-    m += (state.lifetimeEarned / 1e12) * 0.001;
+    // 0.1% per 1T cookies — guard against NaN lifetimeEarned
+    m += safeNum(state.lifetimeEarned, 0) / 1e12 * 0.001;
   }
-  return m;
+  return safeNum(m, 1);
 };
 const nftMult = () => state.ownsGoldenNFT ? 2 : 1;
-const globalMult = () => Math.min(milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult() * endgameMult(), 1e50);
+const globalMult = () => safeNum(
+  Math.min(milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult() * endgameMult(), 1e50),
+  1
+);
 
 const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
 const adBoostMult = () => adBoostActive() ? 1.5 : 1;
@@ -463,8 +480,16 @@ const goldenMult = () => 5 + repLevel('r_golden');
 const critChance = () => hasPrestige('ot_crit') ? Math.min(0.50, 0.05 + repLevel('r_crit') * 0.05) : 0;
 const critDmgMult = () => 3 + repLevel('r_crit') * 0.5;
 
-const perClick = () => (1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0)) * globalMult() * clickPrestige() * adBoostMult();
-const perSec = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult() * passivePrestige() * adBoostMult();
+const perClick = () => {
+  const base = UPGRADES.filter(u => u.kind === 'click').reduce(
+    (s, u) => s + u.power * safeNum(state.owned[u.id], 0) * tierMult(u.id), 0);
+  return safeNum((1 + base) * globalMult() * clickPrestige() * adBoostMult(), 1);
+};
+const perSec = () => {
+  const base = UPGRADES.filter(u => u.kind === 'cps').reduce(
+    (s, u) => s + u.power * safeNum(state.owned[u.id], 0) * tierMult(u.id), 0);
+  return safeNum(base * globalMult() * passivePrestige() * adBoostMult(), 0);
+};
 
 // Prestige calculation — 1 point per 1B cookies in current run
 const calcPrestigeGain = () => Math.floor(state.totalEarned / 1e9);
@@ -978,14 +1003,18 @@ function activateAdBoost() {
 // Click cookie
 // ============================================================
 cookieBtn.addEventListener('click', (e) => {
-  const bonusMult = bonusActive ? goldenMult() : 1;
-  let gained = perClick() * bonusMult;
+  const bonusMult = bonusActive ? safeNum(goldenMult(), 1) : 1;
+  let gained = safeNum(perClick() * bonusMult, 1);
   // Crit click check
   let isCrit = false;
   if (critChance() > 0 && Math.random() < critChance()) {
-    gained *= critDmgMult();
+    gained = safeNum(gained * critDmgMult(), gained);
     isCrit = true;
   }
+  // Final guard: if any of the cookie counters are NaN, heal them before adding.
+  state.cookies = safeNum(state.cookies, 0);
+  state.totalEarned = safeNum(state.totalEarned, 0);
+  state.lifetimeEarned = safeNum(state.lifetimeEarned, 0);
   state.cookies += gained;
   state.totalEarned += gained;
   state.lifetimeEarned += gained;
@@ -1133,10 +1162,10 @@ setInterval(() => {
   const now = performance.now();
   const dt = (now - last) / 1000;
   last = now;
-  const gained = perSec() * dt;
-  state.cookies += gained;
-  state.totalEarned += gained;
-  state.lifetimeEarned += gained;
+  const gained = safeNum(perSec() * dt, 0);
+  state.cookies = safeNum(state.cookies, 0) + gained;
+  state.totalEarned = safeNum(state.totalEarned, 0) + gained;
+  state.lifetimeEarned = safeNum(state.lifetimeEarned, 0) + gained;
   render();
   checkAchievements();
 }, 100);
@@ -1872,10 +1901,10 @@ scheduleGoldenCookie();
 // Auto-clicker prestige unlock (1 click/sec)
 setInterval(() => {
   if (hasPrestige('ot_auto_click')) {
-    const gained = perClick();
-    state.cookies += gained;
-    state.totalEarned += gained;
-    state.lifetimeEarned += gained;
+    const gained = safeNum(perClick(), 1);
+    state.cookies = safeNum(state.cookies, 0) + gained;
+    state.totalEarned = safeNum(state.totalEarned, 0) + gained;
+    state.lifetimeEarned = safeNum(state.lifetimeEarned, 0) + gained;
   }
 }, 1000);
 
