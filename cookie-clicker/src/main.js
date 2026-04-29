@@ -823,7 +823,7 @@ function activateAdBoost() {
 // ============================================================
 // Click cookie
 // ============================================================
-cookieBtn.addEventListener('click', () => {
+cookieBtn.addEventListener('click', (e) => {
   const bonusMult = bonusActive ? goldenMult() : 1;
   let gained = perClick() * bonusMult;
   // Crit click check
@@ -840,11 +840,26 @@ cookieBtn.addEventListener('click', () => {
   cookieBtn.classList.remove('pop');
   void cookieBtn.offsetWidth;
   cookieBtn.classList.add('pop');
-  if (isCrit) toast('⚡', 'CRIT!', `${fmt(gained)} cookies!`);
+  
+  if (isCrit) {
+    showCrit(e.clientX, e.clientY);
+    toast('⚡', 'CRIT!', `${fmt(gained)} cookies!`);
+  }
+  
   render();
   checkAchievements();
   maybePromptAdd();
 });
+
+function showCrit(x, y) {
+  const el = document.createElement('div');
+  el.className = 'crit-popup';
+  el.textContent = '⚡CRIT!';
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
 
 // ============================================================
 // Render
