@@ -25,22 +25,22 @@ const usdcContract = getContract({
 // Upgrade definitions
 // ============================================================
 const UPGRADES = [
-  { id: 'cursor',  name: 'Click Bot',     emoji: 'ðŸ¤–',  kind: 'click', power: 1,        baseCost: 15,             orbit: 'inner' },
-  { id: 'spoon',   name: 'Auto-Liker',    emoji: 'ðŸ’œ',  kind: 'click', power: 5,        baseCost: 100,            orbit: 'inner' },
-  { id: 'whisk',   name: 'Recast Engine', emoji: 'ðŸ”',  kind: 'click', power: 25,       baseCost: 1_500,          orbit: 'inner' },
-  { id: 'mixer',   name: 'Based Node',    emoji: 'ðŸ”µ',  kind: 'click', power: 100,      baseCost: 25_000,         orbit: 'inner' },
-  { id: 'grandma', name: 'Click Farm',    emoji: 'ðŸ“±',  kind: 'cps',   power: 1,        baseCost: 50,             orbit: 'mid' },
-  { id: 'farm',    name: 'AI Clicker',    emoji: 'ðŸ§ ',  kind: 'cps',   power: 5,        baseCost: 500,            orbit: 'mid' },
-  { id: 'mine',    name: 'Crypto Miner',  emoji: 'â›ï¸', kind: 'cps',   power: 25,       baseCost: 5_000,          orbit: 'mid' },
-  { id: 'factory', name: 'Meme Factory',  emoji: 'ðŸ¸',  kind: 'cps',   power: 100,      baseCost: 50_000,         orbit: 'mid' },
-  { id: 'bank',    name: 'DeFi Protocol', emoji: 'ðŸ¦',  kind: 'cps',   power: 500,      baseCost: 500_000,        orbit: 'outer' },
-  { id: 'temple',  name: 'Farcaster Hub', emoji: 'ðŸŸ£',  kind: 'cps',   power: 2_500,    baseCost: 5_000_000,      orbit: 'outer' },
-  { id: 'wizard',  name: 'LLM Cluster',   emoji: 'ðŸ–¥ï¸', kind: 'cps',   power: 12_500,   baseCost: 50_000_000,     orbit: 'outer', fx: 'shoot' },
-  { id: 'rocket',  name: 'AGI',           emoji: 'ðŸŒŒ',  kind: 'cps',   power: 60_000,   baseCost: 500_000_000,    orbit: 'outer' },
-  { id: 'quantum', name: 'Quantum Chain', emoji: 'âš›ï¸', kind: 'cps',   power: 250_000,  baseCost: 5_000_000_000,  orbit: 'outer' },
-  { id: 'dao',     name: 'DAO Council',   emoji: 'ðŸ›ï¸', kind: 'cps',   power: 1_500_000,baseCost: 50_000_000_000, orbit: 'outer' },
-  { id: 'meta',    name: 'Metaverse',     emoji: 'ðŸŒ',  kind: 'cps',   power: 10_000_000,baseCost:500_000_000_000, orbit: 'outer' },
-  { id: 'singularity',name:'Singularity', emoji: 'âœ¨',  kind: 'cps',   power:100_000_000,baseCost:5_000_000_000_000,orbit:'outer' },
+  { id: 'cursor', name: 'Click Bot', emoji: 'ðŸ¤–', kind: 'click', power: 1, baseCost: 15, orbit: 'inner' },
+  { id: 'spoon', name: 'Auto-Liker', emoji: 'ðŸ’œ', kind: 'click', power: 5, baseCost: 100, orbit: 'inner' },
+  { id: 'whisk', name: 'Recast Engine', emoji: 'ðŸ”', kind: 'click', power: 25, baseCost: 1_500, orbit: 'inner' },
+  { id: 'mixer', name: 'Based Node', emoji: 'ðŸ”µ', kind: 'click', power: 100, baseCost: 25_000, orbit: 'inner' },
+  { id: 'grandma', name: 'Click Farm', emoji: 'ðŸ“±', kind: 'cps', power: 1, baseCost: 50, orbit: 'mid' },
+  { id: 'farm', name: 'AI Clicker', emoji: 'ðŸ§ ', kind: 'cps', power: 5, baseCost: 500, orbit: 'mid' },
+  { id: 'mine', name: 'Crypto Miner', emoji: 'â›ï¸', kind: 'cps', power: 25, baseCost: 5_000, orbit: 'mid' },
+  { id: 'factory', name: 'Meme Factory', emoji: 'ðŸ¸', kind: 'cps', power: 100, baseCost: 50_000, orbit: 'mid' },
+  { id: 'bank', name: 'DeFi Protocol', emoji: 'ðŸ¦', kind: 'cps', power: 500, baseCost: 500_000, orbit: 'outer' },
+  { id: 'temple', name: 'Farcaster Hub', emoji: 'ðŸŸ£', kind: 'cps', power: 2_500, baseCost: 5_000_000, orbit: 'outer' },
+  { id: 'wizard', name: 'LLM Cluster', emoji: 'ðŸ–¥ï¸', kind: 'cps', power: 12_500, baseCost: 50_000_000, orbit: 'outer', fx: 'shoot' },
+  { id: 'rocket', name: 'AGI', emoji: 'ðŸŒŒ', kind: 'cps', power: 60_000, baseCost: 500_000_000, orbit: 'outer' },
+  { id: 'quantum', name: 'Quantum Chain', emoji: 'âš›ï¸', kind: 'cps', power: 250_000, baseCost: 5_000_000_000, orbit: 'outer' },
+  { id: 'dao', name: 'DAO Council', emoji: 'ðŸ›ï¸', kind: 'cps', power: 1_500_000, baseCost: 50_000_000_000, orbit: 'outer' },
+  { id: 'meta', name: 'Metaverse', emoji: 'ðŸŒ', kind: 'cps', power: 10_000_000, baseCost: 500_000_000_000, orbit: 'outer' },
+  { id: 'singularity', name: 'Singularity', emoji: 'âœ¨', kind: 'cps', power: 100_000_000, baseCost: 5_000_000_000_000, orbit: 'outer' },
 ];
 
 const COST_MULTIPLIER = 1.15;
@@ -48,10 +48,10 @@ const MAX_ORBIT = 8; // visual cap only
 
 // --- Tier upgrades (generated): each doubles a building's output ---
 const TIER_DEFS = [
-  { at: 1,  costMult: 10,     tag: 'v2.0' },
-  { at: 5,  costMult: 100,    tag: 'Pro' },
-  { at: 25, costMult: 5_000,  tag: 'Ultra' },
-  { at: 50, costMult: 100_000,tag: 'Quantum' },
+  { at: 1, costMult: 10, tag: 'v2.0' },
+  { at: 5, costMult: 100, tag: 'Pro' },
+  { at: 25, costMult: 5_000, tag: 'Ultra' },
+  { at: 50, costMult: 100_000, tag: 'Quantum' },
 ];
 const TIER_UPGRADES = UPGRADES.flatMap(u =>
   TIER_DEFS.map(t => ({
@@ -64,68 +64,68 @@ const TIER_UPGRADES = UPGRADES.flatMap(u =>
 // --- Prestige upgrades (persist across resets) ---
 // Repeatable upgrades â€” cost scales exponentially per level
 const PRESTIGE_REPEATABLE = [
-  { id: 'r_click',   name: 'Click Protocol',      emoji: 'ðŸ‘†', baseCost: 1,  scale: 1.5, desc: '+25% click power',             effectPer: 0.25, cat: 'click' },
-  { id: 'r_passive', name: 'Yield Farming',        emoji: 'ðŸ“ˆ', baseCost: 1,  scale: 1.5, desc: '+25% passive CpS',             effectPer: 0.25, cat: 'passive' },
-  { id: 'r_golden',  name: 'Lucky Algorithm',      emoji: 'ðŸ€', baseCost: 2,  scale: 1.8, desc: '+1Ã— golden cookie multiplier', effectPer: 1,    cat: 'golden' },
-  { id: 'r_daily',   name: 'Compounding Interest',  emoji: 'ðŸŽ', baseCost: 2,  scale: 1.8, desc: '+50% daily bonus',              effectPer: 0.5,  cat: 'daily' },
-  { id: 'r_offline', name: 'Sleep Mining',          emoji: 'ðŸ˜´', baseCost: 3,  scale: 2.0, desc: '+10% offline production',       effectPer: 0.10, cat: 'offline' },
-  { id: 'r_discount',name: 'Bulk Discount',         emoji: 'ðŸ’¸', baseCost: 3,  scale: 2.0, desc: '-3% building costs (max âˆ’50%)', effectPer: 0.03, cat: 'economy', cap: 16 },
-  { id: 'r_crit',    name: 'Overclock',             emoji: 'âš¡', baseCost: 5,  scale: 2.2, desc: '+5% crit chance & damage',      effectPer: 0.05, cat: 'click' },
-  { id: 'r_starter', name: 'Trust Fund',            emoji: 'ðŸ’°', baseCost: 5,  scale: 2.5, desc: 'Start with 10Ã— more cookies',   effectPer: 10,   cat: 'starter' },
-  { id: 'r_all',     name: 'WAGMI Protocol',        emoji: 'ðŸš€', baseCost: 10, scale: 2.5, desc: '+15% all production',           effectPer: 0.15, cat: 'all' },
+  { id: 'r_click', name: 'Click Protocol', emoji: 'ðŸ‘†', baseCost: 1, scale: 1.5, desc: '+25% click power', effectPer: 0.25, cat: 'click' },
+  { id: 'r_passive', name: 'Yield Farming', emoji: 'ðŸ“ˆ', baseCost: 1, scale: 1.5, desc: '+25% passive CpS', effectPer: 0.25, cat: 'passive' },
+  { id: 'r_golden', name: 'Lucky Algorithm', emoji: 'ðŸ€', baseCost: 2, scale: 1.8, desc: '+1Ã— golden cookie multiplier', effectPer: 1, cat: 'golden' },
+  { id: 'r_daily', name: 'Compounding Interest', emoji: 'ðŸŽ', baseCost: 2, scale: 1.8, desc: '+50% daily bonus', effectPer: 0.5, cat: 'daily' },
+  { id: 'r_offline', name: 'Sleep Mining', emoji: 'ðŸ˜´', baseCost: 3, scale: 2.0, desc: '+10% offline production', effectPer: 0.10, cat: 'offline' },
+  { id: 'r_discount', name: 'Bulk Discount', emoji: 'ðŸ’¸', baseCost: 3, scale: 2.0, desc: '-3% building costs (max âˆ’50%)', effectPer: 0.03, cat: 'economy', cap: 16 },
+  { id: 'r_crit', name: 'Overclock', emoji: 'âš¡', baseCost: 5, scale: 2.2, desc: '+5% crit chance & damage', effectPer: 0.05, cat: 'click' },
+  { id: 'r_starter', name: 'Trust Fund', emoji: 'ðŸ’°', baseCost: 5, scale: 2.5, desc: 'Start with 10Ã— more cookies', effectPer: 10, cat: 'starter' },
+  { id: 'r_all', name: 'WAGMI Protocol', emoji: 'ðŸš€', baseCost: 10, scale: 2.5, desc: '+15% all production', effectPer: 0.15, cat: 'all' },
 ];
 // One-time prestige upgrades â€” unique unlocks
 const PRESTIGE_ONETIME = [
-  { id: 'ot_genesis',       name: 'Genesis Block',          emoji: 'ðŸ§±', cost: 1,  desc: 'Start each run with 10,000 cookies' },
-  { id: 'ot_crit',          name: 'Critical Hit',           emoji: 'ðŸŽ¯', cost: 1,  desc: 'Unlock crit clicks: 5% chance for 3Ã— damage' },
-  { id: 'ot_diamond',       name: 'Diamond Hands',          emoji: 'ðŸ’Ž', cost: 3,  desc: '+50% offline earnings rate' },
-  { id: 'ot_moon',          name: 'Moon Math',              emoji: 'ðŸŒ™', cost: 3,  desc: 'Golden cookies appear 2Ã— more often' },
-  { id: 'ot_whale',         name: 'Whale Wallet',           emoji: 'ðŸ‹', cost: 5,  desc: 'Start with 5 free Click Farms after prestige' },
-  { id: 'ot_buyall',        name: 'Bulk Buy',               emoji: 'ðŸ›’', cost: 5,  desc: 'Unlock "Buy Max" button in the shop' },
-  { id: 'ot_offline_cap',   name: 'Deep Sleep',             emoji: 'ðŸ›ï¸', cost: 8,  desc: 'Offline cap raised from 8h to 24h' },
-  { id: 'ot_auto_click',    name: 'Auto-Clicker v1',        emoji: 'ðŸ¤–', cost: 15, desc: '1 automatic click per second' },
-  { id: 'ot_prestige_slot', name: 'Permanent Upgrade Slot',  emoji: 'ðŸ“Œ', cost: 20, desc: 'Keep 1 tier upgrade through prestige resets' },
-  { id: 'ot_milestone_1',   name: "Billionaire's Club",     emoji: 'ðŸ‘‘', cost: 25, desc: 'All production +50% (requires 10B lifetime)' },
-  { id: 'ot_milestone_2',   name: 'Trillion Toast',         emoji: 'ðŸ†', cost: 50, desc: 'All production +100% (requires 1T lifetime)' },
+  { id: 'ot_genesis', name: 'Genesis Block', emoji: 'ðŸ§±', cost: 1, desc: 'Start each run with 10,000 cookies' },
+  { id: 'ot_crit', name: 'Critical Hit', emoji: 'ðŸŽ¯', cost: 1, desc: 'Unlock crit clicks: 5% chance for 3Ã— damage' },
+  { id: 'ot_diamond', name: 'Diamond Hands', emoji: 'ðŸ’Ž', cost: 3, desc: '+50% offline earnings rate' },
+  { id: 'ot_moon', name: 'Moon Math', emoji: 'ðŸŒ™', cost: 3, desc: 'Golden cookies appear 2Ã— more often' },
+  { id: 'ot_whale', name: 'Whale Wallet', emoji: 'ðŸ‹', cost: 5, desc: 'Start with 5 free Click Farms after prestige' },
+  { id: 'ot_buyall', name: 'Bulk Buy', emoji: 'ðŸ›’', cost: 5, desc: 'Unlock "Buy Max" button in the shop' },
+  { id: 'ot_offline_cap', name: 'Deep Sleep', emoji: 'ðŸ›ï¸', cost: 8, desc: 'Offline cap raised from 8h to 24h' },
+  { id: 'ot_auto_click', name: 'Auto-Clicker v1', emoji: 'ðŸ¤–', cost: 15, desc: '1 automatic click per second' },
+  { id: 'ot_prestige_slot', name: 'Permanent Upgrade Slot', emoji: 'ðŸ“Œ', cost: 20, desc: 'Keep 1 tier upgrade through prestige resets' },
+  { id: 'ot_milestone_1', name: "Billionaire's Club", emoji: 'ðŸ‘‘', cost: 25, desc: 'All production +50% (requires 10B lifetime)' },
+  { id: 'ot_milestone_2', name: 'Trillion Toast', emoji: 'ðŸ†', cost: 50, desc: 'All production +100% (requires 1T lifetime)' },
 ];
 
 const ACHIEVEMENTS = [
   // Cookie milestones
-  { id: 'c1',    need: 1,               label: 'First Click',        emoji: 'ðŸª', kind: 'cookies' },
-  { id: 'c2',    need: 100,             label: 'Getting Started',    emoji: 'ðŸ¥ ', kind: 'cookies' },
-  { id: 'c3',    need: 1_000,           label: 'A Thousand!',        emoji: 'ðŸŽ‰', kind: 'cookies' },
-  { id: 'c4',    need: 10_000,          label: '10K Club',           emoji: 'ðŸŒŸ', kind: 'cookies' },
-  { id: 'c5',    need: 100_000,         label: 'Six Figures',        emoji: 'ðŸ’°', kind: 'cookies' },
-  { id: 'c6',    need: 1_000_000,       label: 'Millionaire',        emoji: 'ðŸ’Ž', kind: 'cookies' },
-  { id: 'c7',    need: 10_000_000,      label: 'Deca-Millionaire',   emoji: 'ðŸ’«', kind: 'cookies' },
-  { id: 'c8',    need: 100_000_000,     label: 'Centimillionaire',   emoji: 'ðŸŒ•', kind: 'cookies' },
-  { id: 'c9',    need: 1_000_000_000,   label: 'Billionaire',        emoji: 'ðŸ‘‘', kind: 'cookies' },
-  { id: 'c10',   need: 100_000_000_000, label: 'Cookie Whale',       emoji: 'ðŸ‹', kind: 'cookies' },
+  { id: 'c1', need: 1, label: 'First Click', emoji: 'ðŸª', kind: 'cookies' },
+  { id: 'c2', need: 100, label: 'Getting Started', emoji: 'ðŸ¥ ', kind: 'cookies' },
+  { id: 'c3', need: 1_000, label: 'A Thousand!', emoji: 'ðŸŽ‰', kind: 'cookies' },
+  { id: 'c4', need: 10_000, label: '10K Club', emoji: 'ðŸŒŸ', kind: 'cookies' },
+  { id: 'c5', need: 100_000, label: 'Six Figures', emoji: 'ðŸ’°', kind: 'cookies' },
+  { id: 'c6', need: 1_000_000, label: 'Millionaire', emoji: 'ðŸ’Ž', kind: 'cookies' },
+  { id: 'c7', need: 10_000_000, label: 'Deca-Millionaire', emoji: 'ðŸ’«', kind: 'cookies' },
+  { id: 'c8', need: 100_000_000, label: 'Centimillionaire', emoji: 'ðŸŒ•', kind: 'cookies' },
+  { id: 'c9', need: 1_000_000_000, label: 'Billionaire', emoji: 'ðŸ‘‘', kind: 'cookies' },
+  { id: 'c10', need: 100_000_000_000, label: 'Cookie Whale', emoji: 'ðŸ‹', kind: 'cookies' },
   // Click milestones
-  { id: 'cl1',   need: 100,     label: '100 Clicks',         emoji: 'ðŸ‘†', kind: 'clicks' },
-  { id: 'cl2',   need: 1_000,   label: '1K Clicks',          emoji: 'âœ‹', kind: 'clicks' },
-  { id: 'cl3',   need: 10_000,  label: '10K Clicks',         emoji: 'ðŸ’ª', kind: 'clicks' },
-  { id: 'cl4',   need: 100_000, label: '100K Clicks',        emoji: 'ðŸ¤–', kind: 'clicks' },
+  { id: 'cl1', need: 100, label: '100 Clicks', emoji: 'ðŸ‘†', kind: 'clicks' },
+  { id: 'cl2', need: 1_000, label: '1K Clicks', emoji: 'âœ‹', kind: 'clicks' },
+  { id: 'cl3', need: 10_000, label: '10K Clicks', emoji: 'ðŸ’ª', kind: 'clicks' },
+  { id: 'cl4', need: 100_000, label: '100K Clicks', emoji: 'ðŸ¤–', kind: 'clicks' },
   // Building milestones
-  { id: 'b1',    need: 1,   label: 'First Purchase',     emoji: 'ðŸ“', kind: 'buildings' },
-  { id: 'b2',    need: 10,  label: '10 Buildings',       emoji: 'ðŸ—ï¸', kind: 'buildings' },
-  { id: 'b3',    need: 50,  label: '50 Buildings',       emoji: 'ðŸ¢', kind: 'buildings' },
-  { id: 'b4',    need: 100, label: '100 Buildings',      emoji: 'ðŸ™ï¸', kind: 'buildings' },
-  { id: 'b5',    need: 200, label: '200 Buildings',      emoji: 'ðŸŒ†', kind: 'buildings' },
+  { id: 'b1', need: 1, label: 'First Purchase', emoji: 'ðŸ“', kind: 'buildings' },
+  { id: 'b2', need: 10, label: '10 Buildings', emoji: 'ðŸ—ï¸', kind: 'buildings' },
+  { id: 'b3', need: 50, label: '50 Buildings', emoji: 'ðŸ¢', kind: 'buildings' },
+  { id: 'b4', need: 100, label: '100 Buildings', emoji: 'ðŸ™ï¸', kind: 'buildings' },
+  { id: 'b5', need: 200, label: '200 Buildings', emoji: 'ðŸŒ†', kind: 'buildings' },
   // Tier milestones
-  { id: 't1',    need: 1,   label: 'First Upgrade',      emoji: 'â¬†ï¸', kind: 'tiers' },
-  { id: 't2',    need: 10,  label: '10 Upgrades',        emoji: 'ðŸ”§', kind: 'tiers' },
-  { id: 't3',    need: 25,  label: '25 Upgrades',        emoji: 'âš™ï¸', kind: 'tiers' },
+  { id: 't1', need: 1, label: 'First Upgrade', emoji: 'â¬†ï¸', kind: 'tiers' },
+  { id: 't2', need: 10, label: '10 Upgrades', emoji: 'ðŸ”§', kind: 'tiers' },
+  { id: 't3', need: 25, label: '25 Upgrades', emoji: 'âš™ï¸', kind: 'tiers' },
   // Prestige milestones
-  { id: 'p1',    need: 1,   label: 'First Prestige',     emoji: 'ðŸ”', kind: 'ascensions' },
-  { id: 'p2',    need: 3,   label: 'Triple Prestige',    emoji: 'â™¾ï¸', kind: 'ascensions' },
-  { id: 'p3',    need: 10,  label: 'Prestige Master',    emoji: 'ðŸŒ ', kind: 'ascensions' },
+  { id: 'p1', need: 1, label: 'First Prestige', emoji: 'ðŸ”', kind: 'ascensions' },
+  { id: 'p2', need: 3, label: 'Triple Prestige', emoji: 'â™¾ï¸', kind: 'ascensions' },
+  { id: 'p3', need: 10, label: 'Prestige Master', emoji: 'ðŸŒ ', kind: 'ascensions' },
   // Special
-  { id: 'sg',    need: 1_000_000, label: '1M CpS',        emoji: 'âš¡', kind: 'cps' },
+  { id: 'sg', need: 1_000_000, label: '1M CpS', emoji: 'âš¡', kind: 'cps' },
   // Ad support
-  { id: 'ad1',   need: 1,         label: 'Ad Supporter',  emoji: 'ðŸ“º', kind: 'adViews' },
+  { id: 'ad1', need: 1, label: 'Ad Supporter', emoji: 'ðŸ“º', kind: 'adViews' },
   // Social
-  { id: 'f1',    need: 1,         label: 'Follow odd',    emoji: 'ðŸ’œ', kind: 'follow' },
+  { id: 'f1', need: 1, label: 'Follow odd', emoji: 'ðŸ’œ', kind: 'follow' },
 ];
 
 // ============================================================
@@ -233,10 +233,83 @@ function loadState() {
     return defaultState();
   } catch { return defaultState(); }
 }
+
 function saveState() {
   state.lastPlayed = Date.now();
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch {}
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    syncToCloud();
+  } catch (e) {
+    console.error('Local save failed', e);
+  }
 }
+
+let lastCloudSync = 0;
+let isCloudLoading = true;
+async function syncToCloud() {
+  if (isCloudLoading) return; // Wait for initial load to finish
+  const now = Date.now();
+  if (now - lastCloudSync < 10000) return; // Sync at most every 10 seconds
+
+  try {
+    const ctx = await sdk.context;
+    const fid = ctx?.user?.fid;
+    if (!fid) return;
+
+    lastCloudSync = now;
+    await sdk.quickAuth.fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fid, state })
+    });
+  } catch (e) {
+    console.error('Cloud sync failed', e);
+  }
+}
+
+async function loadFromCloud() {
+  try {
+    const ctx = await sdk.context;
+    const fid = ctx?.user?.fid;
+    if (!fid) {
+      isCloudLoading = false;
+      return;
+    }
+
+    const r = await sdk.quickAuth.fetch(`/api/sync?fid=${fid}`);
+    if (!r.ok) {
+      isCloudLoading = false;
+      return;
+    }
+
+    const data = await r.json();
+    if (!data || !data.state) {
+      isCloudLoading = false;
+      return;
+    }
+
+    const cloudState = data.state;
+
+    // Simple conflict resolution: Cloud wins if it has more lifetime cookies
+    // or if the local save is non-existent.
+    const cloudCookies = cloudState.lifetimeEarned || 0;
+    const localCookies = state.lifetimeEarned || 0;
+
+    if (cloudCookies > localCookies) {
+      console.log(`Cloud sync: Found better save (${fmt(cloudCookies)} > ${fmt(localCookies)})`);
+      state = Object.assign(state, cloudState);
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state)); // Direct save to avoid re-syncing immediately
+      renderOrbits();
+      render();
+      toast('☁️', 'Cloud Sync', 'Progress restored from your account.');
+    }
+    isCloudLoading = false;
+  } catch (e) {
+    console.error('Cloud load failed', e);
+    isCloudLoading = false;
+  }
+}
+
 setInterval(saveState, 3000);
 window.addEventListener('beforeunload', saveState);
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
@@ -253,42 +326,42 @@ const cost = u => {
 const tierMult = uid => Math.pow(2, TIER_UPGRADES.filter(t => t.buildingId === uid && state.tiersBought.includes(t.id)).length);
 
 // --- Prestige helper functions ---
-const repLevel     = id => state.prestigeRepeatables?.[id] || 0;
-const repCost      = pu => Math.ceil(pu.baseCost * Math.pow(pu.scale, repLevel(pu.id)));
-const hasPrestige  = id => (state.prestigeUpgrades || []).includes(id);
+const repLevel = id => state.prestigeRepeatables?.[id] || 0;
+const repCost = pu => Math.ceil(pu.baseCost * Math.pow(pu.scale, repLevel(pu.id)));
+const hasPrestige = id => (state.prestigeUpgrades || []).includes(id);
 
 // Global multipliers
-const milkMult     = () => 1 + state.unlocked.length * 0.01;
+const milkMult = () => 1 + state.unlocked.length * 0.01;
 const prestigeMult = () => 1 + (state.prestigeLevel * 0.01) + (state.totalEarned / 1e9 * 0.05);
 const clickPrestige = () => 1 + repLevel('r_click') * 0.25;
 const passivePrestige = () => 1 + repLevel('r_passive') * 0.25;
-const allPrestige  = () => 1 + repLevel('r_all') * 0.15;
+const allPrestige = () => 1 + repLevel('r_all') * 0.15;
 const milestoneMult = () => {
   let m = 1;
   if (hasPrestige('ot_milestone_1') && state.lifetimeEarned >= 10e9) m += 0.5;
   if (hasPrestige('ot_milestone_2') && state.lifetimeEarned >= 1e12) m += 1.0;
   return m;
 };
-const nftMult      = () => state.ownsGoldenNFT ? 2 : 1;
-const globalMult   = () => milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult();
+const nftMult = () => state.ownsGoldenNFT ? 2 : 1;
+const globalMult = () => milkMult() * prestigeMult() * allPrestige() * milestoneMult() * nftMult();
 
 const adBoostActive = () => Date.now() < (state.adBoostEnd || 0);
-const adBoostMult   = () => adBoostActive() ? 1.5 : 1;
+const adBoostMult = () => adBoostActive() ? 1.5 : 1;
 
 // Golden cookie bonus multiplier
-const goldenMult   = () => 5 + repLevel('r_golden');
+const goldenMult = () => 5 + repLevel('r_golden');
 
 // Crit click
-const critChance   = () => hasPrestige('ot_crit') ? Math.min(0.50, 0.05 + repLevel('r_crit') * 0.05) : 0;
-const critDmgMult  = () => 3 + repLevel('r_crit') * 0.5;
+const critChance = () => hasPrestige('ot_crit') ? Math.min(0.50, 0.05 + repLevel('r_crit') * 0.05) : 0;
+const critDmgMult = () => 3 + repLevel('r_crit') * 0.5;
 
 const perClick = () => (1 + UPGRADES.filter(u => u.kind === 'click').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0)) * globalMult() * clickPrestige() * adBoostMult();
-const perSec   = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult() * passivePrestige() * adBoostMult();
+const perSec = () => UPGRADES.filter(u => u.kind === 'cps').reduce((s, u) => s + u.power * state.owned[u.id] * tierMult(u.id), 0) * globalMult() * passivePrestige() * adBoostMult();
 
 // Prestige calculation â€” 1 point per 1B cookies in current run
 const calcPrestigeGain = () => Math.floor(state.totalEarned / 1e9);
-const nextPrestigeAt   = () => (Math.floor(state.totalEarned / 1e9) + 1) * 1e9;
-const totalBuildings   = () => Object.values(state.owned).reduce((a, b) => a + b, 0);
+const nextPrestigeAt = () => (Math.floor(state.totalEarned / 1e9) + 1) * 1e9;
+const totalBuildings = () => Object.values(state.owned).reduce((a, b) => a + b, 0);
 
 // Starter cookies on prestige
 const starterCookies = () => {
@@ -300,7 +373,7 @@ const starterCookies = () => {
 
 // Offline config
 const offlineCapHours = () => hasPrestige('ot_offline_cap') ? 24 : 8;
-const offlineRate     = () => {
+const offlineRate = () => {
   let rate = 0.5;
   if (hasPrestige('ot_diamond')) rate += 0.25;
   rate += repLevel('r_offline') * 0.10;
@@ -322,21 +395,27 @@ const fmt = n => {
 // Elements
 // ============================================================
 const $ = id => document.getElementById(id);
-const countEl    = $('count'),    perClickEl = $('perClick'),  perSecEl = $('perSec');
-const cookieBtn  = $('cookie'),   shopEl     = $('shop'),      fxEl      = $('fx');
-const toastsEl   = $('toasts'),   shareBtn   = $('share'),     lbBtn     = $('lbBtn');
-const addBanner  = $('addBanner'),addBtn     = $('addBtn'),    addClose  = $('addClose');
-const lbModal    = $('lbModal'),  lbList     = $('lbList'),    lbClose   = $('lbClose'),  lbYou = $('lbYou');
+const countEl = $('count'), perClickEl = $('perClick'), perSecEl = $('perSec');
+const cookieBtn = $('cookie'), shopEl = $('shop'), fxEl = $('fx');
+const toastsEl = $('toasts'), shareBtn = $('share'), lbBtn = $('lbBtn');
+const addBanner = $('addBanner'), addBtn = $('addBtn'), addClose = $('addClose');
+const profileBtn = $('profileBtn');
+const lbModal = $('lbModal'), lbList = $('lbList'), lbClose = $('lbClose'), lbYou = $('lbYou');
+const userModal = $('userModal'), userClose = $('userClose');
+const paneUserStats = $('paneUserStats'), paneUserNft = $('paneUserNft');
+const userStatsContent = $('userStatsContent');
 const profileTabs = document.querySelectorAll('.profile-tab-btn');
+const userTabs = document.querySelectorAll('.user-tab-btn');
 const paneLeaderboard = $('paneLeaderboard');
 const paneAchievements = $('paneAchievements');
 const profileTitle = $('profileTitle');
-const achList    = $('achList'),  achProgress = $('achProgress');
-const bonusBar   = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
-const shopBtn    = $('shopBtn'),  shopDrawer = $('shopDrawer'),shopClose = $('shopClose'), shopBadge = $('shopAffordable');
+const userTitle = $('userTitle');
+const achList = $('achList'), achProgress = $('achProgress');
+const bonusBar = $('bonusBar'), bonusProgress = $('bonusProgress'), bonusLabel = $('bonusLabel');
+const shopBtn = $('shopBtn'), shopDrawer = $('shopDrawer'), shopClose = $('shopClose'), shopBadge = $('shopAffordable');
 const quickNftBtn = $('quickNftBtn');
-const tabBtns    = document.querySelectorAll('.tab-btn');
-const orbits     = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
+const tabBtns = document.querySelectorAll('.tab-btn');
+const orbits = { inner: $('orbit-inner'), mid: $('orbit-mid'), outer: $('orbit-outer') };
 
 let activeTab = 'click'; // current shop tab
 
@@ -441,10 +520,10 @@ function buy(u) {
   render();
 }
 
-window.buyGoldenNFT = async function() {
+window.buyGoldenNFT = async function () {
   try {
     toast('ðŸ’Ž', 'Connecting...', 'Requesting wallet address');
-    
+
     // 1. Get the user's connected wallet address via Farcaster SDK
     const accounts = await sdk.wallet.ethProvider.request({ method: 'eth_requestAccounts' });
     const userAddress = accounts[0];
@@ -461,9 +540,9 @@ window.buyGoldenNFT = async function() {
     if (!userAddress) throw new Error('No wallet connected');
 
     // 2. Fetch the active claim condition to get the exact required price
-    const condition = await getActiveClaimCondition({ 
-      contract: nftContract, 
-      tokenId: 0n 
+    const condition = await getActiveClaimCondition({
+      contract: nftContract,
+      tokenId: 0n
     });
     const pricePerToken = condition.pricePerToken;
     const currency = condition.currency;
@@ -488,7 +567,7 @@ window.buyGoldenNFT = async function() {
           amountWei: approvalAmount
         });
         const approveData = await encode(approveTx);
-        
+
         const approveHash = await sdk.wallet.ethProvider.request({
           method: 'eth_sendTransaction',
           params: [{
@@ -505,14 +584,14 @@ window.buyGoldenNFT = async function() {
           chain: defineChain(8453),
           transactionHash: approveHash
         });
-        
+
         toast('âœ…', 'USDC Approved!', 'The network is syncing. Tap Buy again in a few seconds to claim your NFT!');
         return; // Stop the flow here to let Warpcast's simulation nodes catch up before the user clicks Buy again
       }
     }
 
     toast('ðŸ’Ž', 'Confirm Purchase', 'Requesting final purchase transaction...');
-    
+
     // 4. Dynamically generate the claim transaction using Thirdweb
     const tx = claimTo({
       contract: nftContract,
@@ -520,9 +599,9 @@ window.buyGoldenNFT = async function() {
       tokenId: 0n,
       quantity: 1n,
     });
-    
+
     const data = await encode(tx);
-    
+
     let priceInWei = 0n;
     if (typeof tx.value === 'function') {
       priceInWei = await tx.value();
@@ -540,7 +619,7 @@ window.buyGoldenNFT = async function() {
         data: data
       }]
     });
-    
+
     if (result) {
       state.ownsGoldenNFT = true;
       saveState();
@@ -552,7 +631,7 @@ window.buyGoldenNFT = async function() {
         const newClaimed = await totalSupply({ contract: nftContract, id: 0n });
         const el = document.getElementById('nftSupplyText');
         if (el) el.textContent = `${newClaimed}/100 claimed`;
-      } catch {}
+      } catch { }
     }
   } catch (err) {
     console.error('NFT Purchase failed:', err);
@@ -643,7 +722,7 @@ function showGoldenCookie() {
   gc.className = 'golden-cookie';
   gc.textContent = 'âœ¨ðŸª';
   gc.style.left = `${15 + Math.random() * 70}%`;
-  gc.style.top  = `${20 + Math.random() * 60}%`;
+  gc.style.top = `${20 + Math.random() * 60}%`;
   document.body.appendChild(gc);
 
   const expire = setTimeout(() => {
@@ -672,7 +751,7 @@ function activateBonus() {
   bonusBarInterval = setInterval(() => {
     const remaining = Math.max(0, end - Date.now());
     bonusProgress.style.width = `${(remaining / DURATION) * 100}%`;
-    bonusLabel.textContent   = `âœ¨ ${goldenMult()}Ã— BONUS â€” ${Math.ceil(remaining / 1000)}s`;
+    bonusLabel.textContent = `âœ¨ ${goldenMult()}Ã— BONUS â€” ${Math.ceil(remaining / 1000)}s`;
     if (remaining <= 0) {
       clearInterval(bonusBarInterval);
       bonusActive = false;
@@ -771,17 +850,17 @@ cookieBtn.addEventListener('click', () => {
 // Render
 // ============================================================
 function render() {
-  countEl.textContent    = fmt(state.cookies);
+  countEl.textContent = fmt(state.cookies);
   const bonusMult = bonusActive ? goldenMult() : 1;
   perClickEl.textContent = fmt(perClick() * bonusMult);
-  perSecEl.textContent   = fmt(perSec());
+  perSecEl.textContent = fmt(perSec());
 
   let affordable = 0;
   shopEl.querySelectorAll('.shop-item:not(.tier-item)').forEach(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
     if (!u) return;
     const c = cost(u);
-    row.querySelector('[data-cost]').textContent  = fmt(c);
+    row.querySelector('[data-cost]').textContent = fmt(c);
     row.querySelector('[data-count]').textContent = state.owned[u.id] ? `Ã—${state.owned[u.id]}` : '';
     const canAfford = state.cookies >= c;
     row.disabled = !canAfford;
@@ -813,15 +892,17 @@ function render() {
   // NFT row visibility â€” admin can always see it for testing
   const nftRow = shopEl.querySelector('.shop-nft');
   if (nftRow) {
-    const hideNft = state.ownsGoldenNFT && window._adminFid !== 1014465;
-    if (hideNft) {
-      nftRow.style.display = 'none';
+    const alreadyOwned = state.ownsGoldenNFT && window._adminFid !== 1014465;
+    const onCorrectTab = activeTab === 'nft';
+
+    // Hide completely if owned, otherwise toggle based on active tab
+    if (alreadyOwned || !onCorrectTab) {
+      nftRow.classList.add('tab-hidden');
     } else {
-      nftRow.style.display = 'flex';
-      nftRow.classList.toggle('tab-hidden', activeTab !== 'nft');
-      nftRow.disabled = false;
-      nftRow.style.order = 0;
+      nftRow.classList.remove('tab-hidden');
     }
+    nftRow.disabled = false;
+    nftRow.style.order = 0;
   }
 
   // Quick NFT Button visibility â€” admin can always see it for testing
@@ -878,7 +959,7 @@ function render() {
 let last = performance.now();
 setInterval(() => {
   const now = performance.now();
-  const dt  = (now - last) / 1000;
+  const dt = (now - last) / 1000;
   last = now;
   const gained = perSec() * dt;
   state.cookies += gained;
@@ -896,14 +977,14 @@ function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
     if (state.unlocked.includes(a.id)) continue;
     let val = 0;
-    if (a.kind === 'cookies')    val = state.lifetimeEarned;
-    if (a.kind === 'clicks')     val = state.totalClicks;
-    if (a.kind === 'buildings')  val = totalBuildings();
-    if (a.kind === 'tiers')      val = state.tiersBought.length;
+    if (a.kind === 'cookies') val = state.lifetimeEarned;
+    if (a.kind === 'clicks') val = state.totalClicks;
+    if (a.kind === 'buildings') val = totalBuildings();
+    if (a.kind === 'tiers') val = state.tiersBought.length;
     if (a.kind === 'ascensions') val = state.ascensions;
-    if (a.kind === 'cps')        val = perSec();
-    if (a.kind === 'adViews')    val = state.adViews || 0;
-    if (a.kind === 'follow')     val = state.unlocked.includes('f1') ? 1 : 0;
+    if (a.kind === 'cps') val = perSec();
+    if (a.kind === 'adViews') val = state.adViews || 0;
+    if (a.kind === 'follow') val = state.unlocked.includes('f1') ? 1 : 0;
     if (val >= a.need) {
       state.unlocked.push(a.id);
       toast(a.emoji, 'Achievement: ' + a.label);
@@ -912,7 +993,7 @@ function checkAchievements() {
   }
 }
 
-window.followCreator = function() {
+window.followCreator = function () {
   sdk.actions.openUrl('https://warpcast.com/oddlyaugmented');
   if (!state.unlocked.includes('f1')) {
     state.unlocked.push('f1');
@@ -959,15 +1040,15 @@ function applyOfflineEarnings() {
   const actualSeconds = (Date.now() - state.lastPlayed) / 1000;
   const maxOffline = 60 * 60 * offlineCapHours();
   const seconds = Math.min(actualSeconds, maxOffline);
-  
+
   if (seconds >= 30) {
     const earned = perSec() * seconds * offlineRate();
-    
+
     if (earned >= 1) {
       state.cookies += earned;
       state.totalEarned += earned;
       state.lifetimeEarned += earned;
-      
+
       if (actualSeconds > 86400) {
         toast('â°', "Cookies won't click themselves!", `But your bots did bake ${fmt(earned)} cookies while you were gone.`);
       } else {
@@ -1020,7 +1101,7 @@ async function autoSubmitScore() {
     if (score - state.lastSubmittedScore < minBump) return;
 
     const username = ctx?.user?.username || ctx?.user?.displayName || 'Anonymous';
-    const r = await fetch('/api/leaderboard', {
+    const r = await sdk.quickAuth.fetch('/api/leaderboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1063,7 +1144,19 @@ profileTabs.forEach(btn => {
   });
 });
 
+userTabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.utab;
+    userTabs.forEach(b => b.classList.toggle('active', b === btn));
+    paneUserStats.classList.toggle('hidden', tab !== 'stats');
+    paneUserNft.classList.toggle('hidden', tab !== 'nft');
+    if (tab === 'stats') renderUserStats();
+    if (tab === 'nft') renderUserNft();
+  });
+});
+
 async function openProfile() {
+  haptic('medium');
   lbModal.classList.remove('hidden');
   // Default to leaderboard view every open
   profileTabs.forEach(b => b.classList.toggle('active', b.dataset.ptab === 'leaderboard'));
@@ -1075,6 +1168,85 @@ async function openProfile() {
   renderAchievements(); // keep grid fresh in the background
   await openLeaderboard();
 }
+
+function openUserModal() {
+  haptic('medium');
+  userModal.classList.remove('hidden');
+  userTabs[0].click(); // default to stats
+  renderUserStats();
+}
+
+function renderUserStats() {
+  if (!userStatsContent) return;
+  const ctx = window._cachedContext;
+  const name = ctx?.user?.displayName || ctx?.user?.username || 'Brave Baker';
+  const fid = ctx?.user?.fid || '???';
+
+  userStatsContent.innerHTML = `
+    <div class="user-info-header">
+      <div class="user-info-name">${name}</div>
+      <div class="user-info-fid">FID: ${fid}</div>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Total Cookies</span>
+      <span class="user-stat-value">${fmt(state.cookies)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Lifetime Earned</span>
+      <span class="user-stat-value">${fmt(state.lifetimeEarned)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Total Clicks</span>
+      <span class="user-stat-value">${fmt(state.totalClicks)}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Prestige Level</span>
+      <span class="user-stat-value">${state.prestigeLevel}</span>
+    </div>
+    <div class="user-stat-row">
+      <span class="user-stat-label">Ascensions</span>
+      <span class="user-stat-value">${state.ascensions}</span>
+    </div>
+  `;
+}
+
+function renderUserNft() {
+  if (!paneUserNft) return;
+
+  if (state.ownsGoldenNFT) {
+    paneUserNft.innerHTML = `
+      <div class="nft-pane-content">
+        <img src="/golden-cookie.png" class="nft-display-img" alt="Golden Cookie NFT">
+        <div>
+          <h3 class="nft-status-title">Golden Cookie NFT</h3>
+          <p class="nft-status-desc">Status: <b>Verified Owner</b></p>
+          <p class="nft-status-desc" style="margin-top: 10px; font-size: 0.8rem; opacity: 0.6;">
+            Enjoy your 2x multiplier and golden bakery!
+          </p>
+        </div>
+      </div>`;
+  } else {
+    paneUserNft.innerHTML = `
+      <div class="nft-pane-content">
+        <div class="nft-display-img" style="background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+          <span style="font-size: 3rem;">🔒</span>
+        </div>
+        <div>
+          <h3 class="nft-status-title" style="color: #fff; opacity: 0.5;">No NFT Detected</h3>
+          <p class="nft-status-desc">Purchase the golden cookie to get x2 your score!</p>
+          <button class="nft-prompt-btn" onclick="activeTab='nft'; tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'nft')); shopDrawer.classList.remove('hidden'); requestAnimationFrame(() => shopDrawer.classList.add('open')); document.getElementById('userModal').classList.add('hidden'); render();">Go to Shop</button>
+        </div>
+      </div>`;
+  }
+}
+
+if (profileBtn) {
+  profileBtn.addEventListener('click', openUserModal);
+}
+if (userClose) {
+  userClose.addEventListener('click', () => userModal.classList.add('hidden'));
+}
+userModal?.addEventListener('click', e => { if (e.target === userModal) userModal.classList.add('hidden'); });
 
 async function openLeaderboard() {
   lbList.innerHTML = '<p class="lb-msg">Loading...</p>';
@@ -1095,7 +1267,7 @@ async function openLeaderboard() {
         const displayName = row.username;
         return `
         <div class="lb-row">
-          <span class="lb-rank">${['ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰'][i] ?? `#${i + 1}`}</span>
+          <span class="lb-rank">${['ðŸ¥‡', 'ðŸ¥ˆ', 'ðŸ¥‰'][i] ?? `#${i + 1}`}</span>
           <span class="lb-name-row">
             <span class="lb-name-text ${isGolden ? 'golden' : ''}">${escapeHtml(displayName)}</span>
             <span class="lb-plevel">ðŸ”${row.prestige_level || 0}</span>
@@ -1142,7 +1314,7 @@ shareBtn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(`I baked ${fmt(state.totalEarned)} cookies! https://cookie-clicker-hv5w.vercel.app/`);
       toast('ðŸ“‹', 'Copied to clipboard');
-    } catch {}
+    } catch { }
   }
 });
 
@@ -1158,10 +1330,11 @@ function maybePromptAdd() {
 
 addBtn.addEventListener('click', async () => {
   try {
+    haptic('medium');
     await sdk.actions.addMiniApp();
     toast('â­', 'Added!', 'FarClick is in your apps.');
     autoSubmitScore();
-  } catch {}
+  } catch { }
   addBanner.classList.add('hidden');
 });
 addClose.addEventListener('click', () => addBanner.classList.add('hidden'));
@@ -1181,7 +1354,7 @@ if (followBtn && followModal) {
     try {
       const ctx = await sdk.context;
       const viewerFid = ctx?.user?.fid;
-      
+
       if (!viewerFid) {
         toast('âš ï¸', 'Error', 'Could not detect your Farcaster ID to verify follow.');
         return;
@@ -1200,7 +1373,7 @@ if (followBtn && followModal) {
       let verified = false;
       for (let i = 0; i < 5; i++) {
         await new Promise(r => setTimeout(r, 3000));
-        
+
         try {
           const res = await fetch(`/api/verify-follow?viewer_fid=${viewerFid}`);
           if (res.ok) {
@@ -1314,9 +1487,9 @@ function renderPrestigeDrawer() {
     <div class="prestige-action-box">
       <p>Prestiging resets cookies, buildings & upgrades but gives you <b>permanent production bonuses</b> (+1% per level).</p>
       ${gain < 1
-        ? `<p>ðŸ”’ Earn <b>${fmt(nextPt)}</b> cookies this run to unlock. You have <b>${fmt(state.totalEarned)}</b>.</p>`
-        : `<p>You would earn <b>${gain}</b> prestige point${gain !== 1 ? 's' : ''} ðŸ’ </p>`
-      }
+      ? `<p>ðŸ”’ Earn <b>${fmt(nextPt)}</b> cookies this run to unlock. You have <b>${fmt(state.totalEarned)}</b>.</p>`
+      : `<p>You would earn <b>${gain}</b> prestige point${gain !== 1 ? 's' : ''} ðŸ’ </p>`
+    }
       <button id="prestigeActionBtn" class="prestige-btn" ${gain < 1 ? 'disabled' : ''}>â­ Prestige${gain > 0 ? ` (+${gain} pts)` : ''}</button>
     </div>
 
@@ -1486,7 +1659,7 @@ function buyPrestigeOneTime(id) {
 // Haptics
 // ============================================================
 function haptic(strength = 'light') {
-  try { sdk.haptics.impactOccurred(strength); } catch {}
+  try { sdk.haptics.impactOccurred(strength); } catch { }
 }
 
 // ============================================================
@@ -1509,13 +1682,31 @@ setInterval(() => {
 }, 1000);
 
 await sdk.actions.ready();
+sdk.back.enableWebNavigation();
 
 // Cache FID for admin checks in synchronous render()
 try {
   const _ctx = await sdk.context;
+  window._cachedContext = _ctx;
   window._adminFid = _ctx?.user?.fid || null;
+  if (_ctx?.user?.pfpUrl && profileBtn) {
+    profileBtn.style.backgroundImage = `url('${_ctx.user.pfpUrl}')`;
+  }
   render(); // Re-render now that we know if user is admin
 } catch { window._adminFid = null; }
 
 setTimeout(autoSubmitScore, 5_000);
+// Attempt cloud load
+loadFromCloud();
 
+// Handle shared cast context
+try {
+  const context = await sdk.context;
+  if (context?.location?.type === 'cast_share') {
+    const cast = context.location.cast;
+    toast('📢', `Shared from @${cast.author.username}`, 'Loading stats...');
+    setTimeout(openProfile, 1500);
+  }
+} catch (e) {
+  console.error("Context check failed", e);
+}

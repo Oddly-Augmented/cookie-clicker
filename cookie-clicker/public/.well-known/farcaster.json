@@ -4,24 +4,27 @@
     "payload": "eyJkb21haW4iOiJjb29raWUtY2xpY2tlci1odjV3LnZlcmNlbC5hcHAifQ",
     "signature": "3p1CyOUIMgJdMABcHFLeLAuFcewKfcHq9Av+KlrXrHoSpiW2ROkWCWBwfluOhYhbi2f+7z/pxf1brroxyW42Rxs="
   },
-  "frame": {
+  "miniapp": {
     "version": "1",
     "name": "FarClick",
-    "subtitle": "Bake. Click. Repeat.",
-    "description": "A cozy cookie clicker mini-game. Tap the cookie, hire grandmas, build wizard towers, and climb the leaderboard.",
-    "tagline": "One cookie. Infinite cookies.",
-    "primaryCategory": "games",
-    "tags": ["clicker", "idle", "game", "cookie", "casual"],
     "iconUrl": "https://cookie-clicker-hv5w.vercel.app/icon.png",
     "homeUrl": "https://cookie-clicker-hv5w.vercel.app/",
+    "description": "Bake. Click. Repeat. A cozy cookie clicker mini-game for Farcaster.",
     "imageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
     "buttonTitle": "FarClick",
     "splashImageUrl": "https://cookie-clicker-hv5w.vercel.app/splash.png",
     "splashBackgroundColor": "#080418",
-    "heroImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
-    "ogTitle": "FarClick",
-    "ogDescription": "Bake. Click. Repeat. Climb the leaderboard.",
-    "ogImageUrl": "https://cookie-clicker-hv5w.vercel.app/og.png",
+    "primaryCategory": "games",
+    "castShareUrl": "https://cookie-clicker-hv5w.vercel.app/",
+    "requiredChains": [
+      "eip155:8453"
+    ],
+    "requiredCapabilities": [
+      "actions.addMiniApp",
+      "sdk.quickAuth",
+      "wallet.getEthereumProvider",
+      "actions.composeCast"
+    ],
     "webhookUrl": "https://cookie-clicker-hv5w.vercel.app/api/webhook"
   }
 }
