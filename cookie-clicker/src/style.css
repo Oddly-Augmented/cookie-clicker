@@ -676,3 +676,93 @@ h1    { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
   right: 1rem !important;
   left: auto !important;
 }
+
+/* --- Prestige info bar (main screen) --- */
+.prestige-info {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #FFD700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+  animation: prestige-info-pulse 3s ease-in-out infinite alternate;
+}
+.prestige-info.hidden { display: none; }
+@keyframes prestige-info-pulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* --- Prestige run info (in drawer) --- */
+.prestige-run-info {
+  background: rgba(121, 89, 255, 0.06);
+  border: 1px solid rgba(121, 89, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+.prestige-run-info p {
+  margin: 0.15rem 0;
+  font-size: 0.75rem;
+  color: #ccc;
+}
+.prestige-run-info b { color: #fff; }
+
+/* --- Prestige progress bar --- */
+.prestige-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+}
+.prestige-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7959FF, #FFD700);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* --- Prestige shop tabs (inside drawer) --- */
+.prestige-shop-tabs {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.2rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 215, 0, 0.08);
+}
+.prestige-shop-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #fff;
+  opacity: 0.55;
+  padding: 0.45rem 0.6rem;
+  border-radius: 9999px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.prestige-shop-tab.active {
+  background: rgba(255, 215, 0, 0.12);
+  opacity: 1;
+  color: #FFD700;
+  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.15);
+}
+
+/* --- Prestige level badge (on repeatable items) --- */
+.prestige-lvl {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #FFD700;
+  background: rgba(255, 215, 0, 0.12);
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+
