@@ -56,6 +56,9 @@ const TIER_DEFS = [
   { at: 5, costMult: 100, tag: 'Pro' },
   { at: 25, costMult: 5_000, tag: 'Ultra' },
   { at: 50, costMult: 100_000, tag: 'Quantum' },
+  { at: 100, costMult: 10_000_000, tag: 'God' },
+  { at: 250, costMult: 1_000_000_000, tag: 'Cosmic' },
+  { at: 500, costMult: 1_000_000_000_000, tag: 'Eternal' },
 ];
 const TIER_UPGRADES = UPGRADES.flatMap(u =>
   TIER_DEFS.map(t => ({
