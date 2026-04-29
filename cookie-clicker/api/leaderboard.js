@@ -56,6 +56,10 @@ export default async function handler(req, res) {
       if (!fid || typeof score !== 'number') {
         return res.status(400).json({ error: 'fid and numeric score required' });
       }
+      // Reject corrupted scores — NaN, Infinity, or absurdly high values
+      if (!Number.isFinite(score) || score < 0 || score > 1e100) {
+        return res.status(400).json({ error: 'Score out of valid range' });
+      }
 
       // Only update if the new score is higher than the existing one.
       const { data: existing, error: selectErr } = await supabase
