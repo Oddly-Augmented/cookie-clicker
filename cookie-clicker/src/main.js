@@ -96,6 +96,8 @@ const PRESTIGE_ONETIME = [
 ];
 
 const ACHIEVEMENTS = [
+  // Social (Pinned/Featured)
+  { id: 'f1', need: 1, label: 'Follow odd', emoji: '💜', kind: 'follow' },
   // Cookie milestones
   { id: 'c1', need: 1, label: 'First Click', emoji: '🍪', kind: 'cookies' },
   { id: 'c2', need: 100, label: 'Getting Started', emoji: '🥠', kind: 'cookies' },
@@ -130,8 +132,6 @@ const ACHIEVEMENTS = [
   { id: 'sg', need: 1_000_000, label: '1M CpS', emoji: '⚡', kind: 'cps' },
   // Ad support
   { id: 'ad1', need: 1, label: 'Ad Supporter', emoji: '📺', kind: 'adViews' },
-  // Social
-  { id: 'f1', need: 1, label: 'Follow odd', emoji: '💜', kind: 'follow' },
 ];
 
 // ============================================================
@@ -337,7 +337,12 @@ const repCost = pu => Math.ceil(pu.baseCost * Math.pow(pu.scale, repLevel(pu.id)
 const hasPrestige = id => (state.prestigeUpgrades || []).includes(id);
 
 // Global multipliers
-const milkMult = () => 1 + state.unlocked.length * 0.01;
+const milkMult = () => {
+  let m = 1 + state.unlocked.length * 0.01;
+  // Meaningful reward: 1.1x total production for following
+  if (state.unlocked.includes('f1')) m *= 1.10;
+  return m;
+};
 const prestigeMult = () => {
   // Use diminishing returns (power curve) for prestige levels
   const levelBonus = Math.pow(state.prestigeLevel, 0.75) * 0.05;
@@ -1046,6 +1051,7 @@ function renderAchievements() {
   achProgress.textContent = `${count} / ${ACHIEVEMENTS.length}`;
   achList.innerHTML = ACHIEVEMENTS.map(a => {
     const unlocked = state.unlocked.includes(a.id);
+    const isFeatured = a.id === 'f1';
     let needText = '';
     if (a.kind === 'cookies') needText = `${fmt(a.need)} cookies`;
     else if (a.kind === 'clicks') needText = `${fmt(a.need)} clicks`;
@@ -1054,11 +1060,11 @@ function renderAchievements() {
     else if (a.kind === 'ascensions') needText = `${a.need} ascensions`;
     else if (a.kind === 'cps') needText = `${fmt(a.need)} CpS`;
     else if (a.kind === 'adViews') needText = `Watch an ad`;
-    else if (a.kind === 'follow') needText = `Follow creator`;
+    else if (a.kind === 'follow') needText = `Follow creator (+10% Boost!)`;
 
     const clickable = a.kind === 'follow' && !unlocked;
     return `
-      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'} ${clickable ? 'clickable' : ''}" ${clickable ? 'onclick="followCreator()"' : ''}>
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'} ${isFeatured ? 'featured' : ''} ${clickable ? 'clickable' : ''}" ${clickable ? 'onclick="followCreator()"' : ''}>
         <span class="ach-emoji">${unlocked ? a.emoji : '🔒'}</span>
         <div class="ach-info">
           <span class="ach-label">${a.label}</span>
@@ -1306,7 +1312,7 @@ async function openLeaderboard() {
         <div class="lb-row">
           <span class="lb-rank">${['🥇', '🥈', '🥉'][i] ?? `#${i + 1}`}</span>
           <span class="lb-name-row">
-            <span class="lb-name-text ${isGolden ? 'golden' : ''}">${escapeHtml(displayName)}</span>
+            <span class="lb-name-text ${isGolden ? 'golden' : ''}" onclick="viewProfile(${row.fid})">${escapeHtml(displayName)}</span>
             <span class="lb-plevel ${row.has_whale ? 'whale-badge' : ''}">🔝${row.prestige_level || 0}</span>
           </span>
           <span class="lb-score">${fmt(row.score)}</span>
@@ -1331,6 +1337,13 @@ async function openLeaderboard() {
     lbList.innerHTML = '<p class="lb-msg">Could not load scores.</p>';
   }
 }
+
+function viewProfile(fid) {
+  if (!fid) return;
+  haptic('light');
+  sdk.actions.viewProfile({ fid });
+}
+window.viewProfile = viewProfile;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({

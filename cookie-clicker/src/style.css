@@ -1562,3 +1562,20 @@ h1 {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Featured Achievement */
+.ach-card.featured {
+  border: 1px solid rgba(179, 136, 255, 0.4);
+  background: linear-gradient(135deg, rgba(121, 89, 255, 0.15), rgba(255, 215, 0, 0.05));
+  box-shadow: 0 4px 15px rgba(121, 89, 255, 0.1);
+}
+
+/* Clickable Leaderboard Names */
+.lb-name-text {
+  cursor: pointer;
+}
+
+.lb-name-text:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
