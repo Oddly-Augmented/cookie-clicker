@@ -284,6 +284,20 @@ function loadState() {
       saved.prestigeLevel = fix(saved.prestigeLevel);
       saved.prestigePoints = fix(saved.prestigePoints);
       saved.totalClicks = fix(saved.totalClicks);
+
+      // Hard-cap runaway prestige loop victims to sanitize the economy
+      const MAX_COOKIES = 1e24; // Septillionaire
+      const MAX_PRESTIGE = 1_000_000;
+      if (saved.cookies > MAX_COOKIES) saved.cookies = MAX_COOKIES;
+      if (saved.totalEarned > MAX_COOKIES) saved.totalEarned = MAX_COOKIES;
+      if (saved.lifetimeEarned > MAX_COOKIES) saved.lifetimeEarned = MAX_COOKIES;
+      if (saved.prestigeLevel > MAX_PRESTIGE) saved.prestigeLevel = MAX_PRESTIGE;
+      if (saved.prestigePoints > MAX_PRESTIGE) saved.prestigePoints = MAX_PRESTIGE;
+      if (saved.prestigeRepeatables) {
+        for (const k in saved.prestigeRepeatables) {
+          if (saved.prestigeRepeatables[k] > 50) saved.prestigeRepeatables[k] = 50;
+        }
+      }
       // Fix corrupted building counts — NaN owned values break perClick/perSec
       if (saved.owned && typeof saved.owned === 'object') {
         for (const key of Object.keys(saved.owned)) {
@@ -363,6 +377,20 @@ async function loadFromCloud() {
     cloudState.prestigeLevel = fix(cloudState.prestigeLevel);
     cloudState.prestigePoints = fix(cloudState.prestigePoints);
     cloudState.totalClicks = fix(cloudState.totalClicks);
+
+    // Hard-cap runaway prestige loop victims to sanitize the economy
+    const MAX_COOKIES = 1e24;
+    const MAX_PRESTIGE = 1_000_000;
+    if (cloudState.cookies > MAX_COOKIES) cloudState.cookies = MAX_COOKIES;
+    if (cloudState.totalEarned > MAX_COOKIES) cloudState.totalEarned = MAX_COOKIES;
+    if (cloudState.lifetimeEarned > MAX_COOKIES) cloudState.lifetimeEarned = MAX_COOKIES;
+    if (cloudState.prestigeLevel > MAX_PRESTIGE) cloudState.prestigeLevel = MAX_PRESTIGE;
+    if (cloudState.prestigePoints > MAX_PRESTIGE) cloudState.prestigePoints = MAX_PRESTIGE;
+    if (cloudState.prestigeRepeatables) {
+      for (const k in cloudState.prestigeRepeatables) {
+        if (cloudState.prestigeRepeatables[k] > 50) cloudState.prestigeRepeatables[k] = 50;
+      }
+    }
     if (cloudState.owned && typeof cloudState.owned === 'object') {
       for (const key of Object.keys(cloudState.owned)) {
         cloudState.owned[key] = fix(cloudState.owned[key]);
@@ -491,9 +519,23 @@ const perSec = () => {
   return safeNum(base * globalMult() * passivePrestige() * adBoostMult(), 0);
 };
 
-// Prestige calculation — 1 point per 1B cookies in current run
-const calcPrestigeGain = () => Math.floor(state.totalEarned / 1e9);
-const nextPrestigeAt = () => (Math.floor(state.totalEarned / 1e9) + 1) * 1e9;
+// Prestige calculation
+const calcPrestigeGain = () => {
+  const earned = safeNum(state.totalEarned, 0);
+  const raw = Math.floor(earned / 1e9);
+  if (raw <= 1000) return raw; // Up to 1T cookies, 1 point per 1B
+  // Power curve to prevent runaway exponential inflation
+  return Math.floor(Math.pow(raw, 0.5) * 31.6227766);
+};
+const nextPrestigeAt = () => {
+  const earned = safeNum(state.totalEarned, 0);
+  const raw = Math.floor(earned / 1e9);
+  if (raw < 1000) return (raw + 1) * 1e9;
+  const currentGain = Math.floor(Math.pow(raw, 0.5) * 31.6227766);
+  const nextGain = currentGain + 1;
+  const nextRaw = Math.pow(nextGain / 31.6227766, 2);
+  return nextRaw * 1e9;
+};
 const totalBuildings = () => Object.values(state.owned).reduce((a, b) => a + b, 0);
 
 // Starter cookies on prestige
