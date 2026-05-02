@@ -1934,6 +1934,16 @@ function haptic(strength = 'light') {
 // ============================================================
 // Boot
 // ============================================================
+
+// IMPORTANT: Call ready() FIRST so Farcaster dismisses the splash screen
+// immediately. If anything below throws, the app still becomes visible.
+try {
+  await sdk.actions.ready();
+  sdk.back.enableWebNavigation();
+} catch (e) {
+  console.warn('sdk.actions.ready() failed — running outside Farcaster?', e);
+}
+
 applyOfflineEarnings();
 applyDailyBonus();
 renderOrbits();
@@ -1949,9 +1959,6 @@ setInterval(() => {
     state.lifetimeEarned = safeNum(state.lifetimeEarned, 0) + gained;
   }
 }, 1000);
-
-await sdk.actions.ready();
-sdk.back.enableWebNavigation();
 
 // Cache FID for admin checks in synchronous render()
 try {
