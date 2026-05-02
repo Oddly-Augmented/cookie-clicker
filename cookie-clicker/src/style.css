@@ -768,6 +768,35 @@ h1 {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.buy-max-btn {
+  font-weight: 800;
+  font-size: 0.7rem;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1a0a3e;
+  padding: 0.3rem 0.55rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.buy-max-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 12px rgba(255, 215, 0, 0.5);
+}
+
+.buy-max-btn:active {
+  transform: scale(0.96);
+}
+
+.buy-max-btn.hidden {
+  display: none;
+}
+
 /* --- toasts --- */
 .toasts {
   position: fixed;

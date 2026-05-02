@@ -77,6 +77,7 @@ const PRESTIGE_REPEATABLE = [
   { id: 'r_crit', name: 'Overclock', emoji: '⚡', baseCost: 5, scale: 2.8, desc: '+5% crit chance & damage', effectPer: 0.05, cat: 'click' },
   { id: 'r_starter', name: 'Trust Fund', emoji: '💰', baseCost: 5, scale: 3.0, desc: 'Start with 10× more cookies', effectPer: 10, cat: 'starter' },
   { id: 'r_all', name: 'WAGMI Protocol', emoji: '🚀', baseCost: 10, scale: 3.5, desc: '+15% all production', effectPer: 0.15, cat: 'all' },
+  { id: 'r_prestige_gain', name: 'Prestige Amplifier', emoji: '🔮', baseCost: 8, scale: 3.0, desc: '+10% prestige points earned', effectPer: 0.10, cat: 'prestige' },
 ];
 // One-time prestige upgrades — unique unlocks
 const PRESTIGE_ONETIME = [
@@ -87,10 +88,19 @@ const PRESTIGE_ONETIME = [
   { id: 'ot_whale', name: 'Whale Wallet', emoji: '🐋', cost: 5, desc: 'Start with 5 free Click Farms after prestige' },
   { id: 'ot_buyall', name: 'Bulk Buy', emoji: '🛒', cost: 5, desc: 'Unlock "Buy Max" button in the shop' },
   { id: 'ot_offline_cap', name: 'Deep Sleep', emoji: '🛏️', cost: 8, desc: 'Offline cap raised from 8h to 24h' },
+  { id: 'ot_lucky_start', name: 'Lucky Start', emoji: '🍀', cost: 10, desc: 'Golden cookie spawns within 30s of a new run' },
+  { id: 'ot_double_daily', name: 'Double Daily', emoji: '📅', cost: 12, desc: 'Daily bonus can be claimed every 12 hours' },
   { id: 'ot_auto_click', name: 'Auto-Clicker v1', emoji: '🤖', cost: 15, desc: '1 automatic click per second' },
+  { id: 'ot_speed_build', name: 'Speed Builder', emoji: '⚡', cost: 15, desc: 'Buildings cost 10% less for the first 5 min of each run' },
   { id: 'ot_prestige_slot', name: 'Permanent Upgrade Slot', emoji: '📌', cost: 20, desc: 'Keep 1 tier upgrade through prestige resets' },
   { id: 'ot_milestone_1', name: "Billionaire's Club", emoji: '👑', cost: 25, desc: 'All production +50% (requires 10B lifetime)' },
+  { id: 'ot_cookie_rain', name: 'Cookie Rain', emoji: '🌧️', cost: 25, desc: '+50% click power during golden cookie bonus' },
+  { id: 'ot_prestige_rush', name: 'Prestige Rush', emoji: '🏃', cost: 30, desc: 'Earn 25% more prestige points when prestiging' },
+  { id: 'ot_mega_crit', name: 'Mega Crit', emoji: '💥', cost: 40, desc: 'Crit base multiplier upgraded from 3× to 5×' },
   { id: 'ot_milestone_2', name: 'Trillion Toast', emoji: '🏆', cost: 50, desc: 'All production +100% (requires 1T lifetime)' },
+  { id: 'ot_auto_click_v2', name: 'Auto-Clicker v2', emoji: '🤖', cost: 75, desc: 'Auto-clicker fires 3× per second (requires v1)' },
+  { id: 'ot_golden_touch', name: 'Golden Touch', emoji: '✨', cost: 100, desc: 'Golden cookie bonus duration +50%' },
+  { id: 'ot_mass_produce', name: 'Mass Production', emoji: '🏗️', cost: 150, desc: '+0.5% production per building owned (synergy)' },
   // Endgame Sinks
   { id: 'ot_degen', name: 'Degen Protocol', emoji: '🎰', cost: 1_000_000, desc: 'A badge of honor for the truly Based. (+1% production)' },
   { id: 'ot_whale_status', name: 'Whale Status', emoji: '🐳', cost: 5_000_000, desc: 'Your prestige level badge turns Golden. (Cosmetic)' },
@@ -425,7 +435,11 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) saveS
 // Helpers
 // ============================================================
 const cost = u => {
-  const discount = Math.min(0.50, (state.prestigeRepeatables?.r_discount || 0) * 0.03);
+  let discount = Math.min(0.50, (state.prestigeRepeatables?.r_discount || 0) * 0.03);
+  // Speed Builder: 10% cheaper for first 5 minutes of a run
+  if (hasPrestige('ot_speed_build') && (Date.now() - (state.runStartTime || 0)) < 300_000) {
+    discount = Math.min(0.60, discount + 0.10);
+  }
   const exp = Math.min(state.owned[u.id], 1700); // cap exponent to prevent Infinity
   return Math.ceil(u.baseCost * COST_MULTIPLIER ** exp * (1 - discount));
 };
@@ -490,6 +504,10 @@ const endgameMult = () => {
     // 0.1% per 1T cookies — guard against NaN lifetimeEarned
     m += safeNum(state.lifetimeEarned, 0) / 1e12 * 0.001;
   }
+  // Mass Production: +0.5% per building owned
+  if (hasPrestige('ot_mass_produce')) {
+    m += totalBuildings() * 0.005;
+  }
   return safeNum(m, 1);
 };
 const nftMult = () => state.ownsGoldenNFT ? 2 : 1;
@@ -506,7 +524,7 @@ const goldenMult = () => 5 + repLevel('r_golden');
 
 // Crit click
 const critChance = () => hasPrestige('ot_crit') ? Math.min(0.50, 0.05 + repLevel('r_crit') * 0.05) : 0;
-const critDmgMult = () => 3 + repLevel('r_crit') * 0.5;
+const critDmgMult = () => (hasPrestige('ot_mega_crit') ? 5 : 3) + repLevel('r_crit') * 0.5;
 
 const perClick = () => {
   const base = UPGRADES.filter(u => u.kind === 'click').reduce(
@@ -523,9 +541,16 @@ const perSec = () => {
 const calcPrestigeGain = () => {
   const earned = safeNum(state.totalEarned, 0);
   const raw = Math.floor(earned / 1e9);
-  if (raw <= 1000) return raw; // Up to 1T cookies, 1 point per 1B
+  let gain;
+  if (raw <= 1000) gain = raw; // Up to 1T cookies, 1 point per 1B
   // Power curve to prevent runaway exponential inflation
-  return Math.floor(Math.pow(raw, 0.5) * 31.6227766);
+  else gain = Math.floor(Math.pow(raw, 0.5) * 31.6227766);
+  // Prestige Rush: +25% more points
+  if (hasPrestige('ot_prestige_rush')) gain = Math.floor(gain * 1.25);
+  // Prestige Amplifier repeatable: +10% per level
+  const ampLvl = repLevel('r_prestige_gain');
+  if (ampLvl > 0) gain = Math.floor(gain * (1 + ampLvl * 0.10));
+  return gain;
 };
 const nextPrestigeAt = () => {
   const earned = safeNum(state.totalEarned, 0);
@@ -644,8 +669,19 @@ UPGRADES.forEach(u => {
       <span class="name">${u.name} <span class="count" data-count></span></span>
       <span class="effect">+${fmt(u.power)} ${u.kind === 'click' ? '/click' : '/sec'}</span>
     </span>
-    <span class="cost" data-cost></span>`;
-  row.addEventListener('click', () => buy(u));
+    <span class="cost" data-cost></span>
+    <span class="buy-max-btn hidden" data-buymax>MAX</span>`;
+  row.addEventListener('click', (e) => {
+    if (e.target.closest('[data-buymax]')) return; // handled by MAX button
+    buy(u);
+  });
+  const maxBtn = row.querySelector('[data-buymax]');
+  if (maxBtn) {
+    maxBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      buyMax(u);
+    });
+  }
   shopEl.appendChild(row);
 });
 
@@ -716,6 +752,22 @@ function buy(u) {
   haptic('light');
   renderOrbits();
   render();
+}
+
+function buyMax(u) {
+  let bought = 0;
+  while (state.cookies >= cost(u)) {
+    state.cookies -= cost(u);
+    state.owned[u.id] += 1;
+    bought++;
+    if (bought >= 500) break; // safety limit
+  }
+  if (bought > 0) {
+    toast(u.emoji, `Bought ${bought}× ${u.name}`, `Total: ${state.owned[u.id]}`);
+    haptic('medium');
+    renderOrbits();
+    render();
+  }
 }
 
 window.buyGoldenNFT = async function () {
@@ -925,7 +977,12 @@ function spawnSparkle() {
 let bonusActive = false;
 let bonusBarInterval = null;
 
-function scheduleGoldenCookie() {
+function scheduleGoldenCookie(luckyStart = false) {
+  if (luckyStart) {
+    // Lucky Start: spawn golden cookie within 10-30s
+    setTimeout(showGoldenCookie, (10 + Math.random() * 20) * 1000);
+    return;
+  }
   const delay = hasPrestige('ot_moon') ? 0.5 : 1;
   setTimeout(showGoldenCookie, (120 + Math.random() * 180) * 1000 * delay);
 }
@@ -964,7 +1021,7 @@ function activateBonus() {
   bonusActive = true;
   clearInterval(bonusBarInterval);
 
-  const DURATION = hasPrestige('ot_dimensional') ? 35_000 : 30_000;
+  const DURATION = hasPrestige('ot_golden_touch') ? 45_000 : (hasPrestige('ot_dimensional') ? 35_000 : 30_000);
   const end = Date.now() + DURATION;
   bonusBar.classList.add('active');
   bonusProgress.style.width = '100%';
@@ -1046,7 +1103,9 @@ function activateAdBoost() {
 // ============================================================
 cookieBtn.addEventListener('click', (e) => {
   const bonusMult = bonusActive ? safeNum(goldenMult(), 1) : 1;
-  let gained = safeNum(perClick() * bonusMult, 1);
+  // Cookie Rain: +50% click power during golden cookie bonus
+  const rainMult = (bonusActive && hasPrestige('ot_cookie_rain')) ? 1.5 : 1;
+  let gained = safeNum(perClick() * bonusMult * rainMult, 1);
   // Crit click check
   let isCrit = false;
   if (critChance() > 0 && Math.random() < critChance()) {
@@ -1097,6 +1156,7 @@ function render() {
   perSecEl.textContent = fmt(perSec());
 
   let affordable = 0;
+  const hasBuyMax = hasPrestige('ot_buyall');
   shopEl.querySelectorAll('.shop-item:not(.tier-item)').forEach(row => {
     const u = UPGRADES.find(x => x.id === row.dataset.id);
     if (!u) return;
@@ -1109,6 +1169,9 @@ function render() {
     // Use CSS order to sort: affordable items get lower order values (appear first)
     row.style.order = row.classList.contains('tab-hidden') ? 1000 : (canAfford ? 0 : 1);
     if (canAfford) affordable++;
+    // Buy Max button visibility
+    const maxBtn = row.querySelector('[data-buymax]');
+    if (maxBtn) maxBtn.classList.toggle('hidden', !hasBuyMax || !canAfford);
   });
 
   // Tier upgrade rows
@@ -1331,13 +1394,14 @@ function applyOfflineEarnings() {
 }
 function applyDailyBonus() {
   const now = Date.now();
-  if (now - state.lastDailyClaim < 24 * 60 * 60 * 1000) return;
+  const cooldown = hasPrestige('ot_double_daily') ? 12 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  if (now - state.lastDailyClaim < cooldown) return;
   const bonus = Math.max(50, perSec() * 60 * 5) * dailyMult();
   state.cookies += bonus;
   state.totalEarned += bonus;
   state.lifetimeEarned += bonus;
   state.lastDailyClaim = now;
-  setTimeout(() => toast('🎁', 'Daily bonus!', `+${fmt(bonus)} cookies. Come back tomorrow!`), 1200);
+  setTimeout(() => toast('🎁', 'Daily bonus!', `+${fmt(bonus)} cookies. Come back ${hasPrestige('ot_double_daily') ? 'in 12 hours' : 'tomorrow'}!`), 1200);
 }
 
 // ============================================================
@@ -1825,6 +1889,16 @@ function renderOnetimeShop(points, owned) {
       locked = true;
       lockMsg = ` (need ${fmt(1e12)} lifetime)`;
     }
+    // Prereq: Auto-Clicker v2 requires v1
+    if (pu.id === 'ot_auto_click_v2' && !hasPrestige('ot_auto_click')) {
+      locked = true;
+      lockMsg = ' (requires Auto-Clicker v1)';
+    }
+    // Prereq: Mega Crit requires Critical Hit
+    if (pu.id === 'ot_mega_crit' && !hasPrestige('ot_crit')) {
+      locked = true;
+      lockMsg = ' (requires Critical Hit)';
+    }
     const canBuy = !bought && !locked && points >= pu.cost;
     return `<button class="prestige-item ${bought ? 'bought' : ''} ${canBuy ? 'affordable' : ''}" data-oid="${pu.id}" ${bought || !canBuy ? 'disabled' : ''}>
       <span class="emoji">${pu.emoji}</span>
@@ -1872,6 +1946,7 @@ function doPrestige() {
   // Reset run state
   state.cookies = starterCookies();
   state.totalEarned = 0;
+  state.runStartTime = Date.now();
   state.owned = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
   // Whale Wallet: start with 5 free Click Farms
   if (hasPrestige('ot_whale')) state.owned.grandma = 5;
@@ -1890,6 +1965,8 @@ function doPrestige() {
   saveState();
   toast('⭐', 'Prestiged!', `+${gain} prestige point${gain !== 1 ? 's' : ''}. Your empire grows stronger.`);
   haptic('heavy');
+  // Lucky Start: schedule an early golden cookie
+  if (hasPrestige('ot_lucky_start')) scheduleGoldenCookie(true);
 }
 
 function buyPrestigeRepeatable(id) {
@@ -1950,7 +2027,8 @@ renderOrbits();
 render();
 scheduleGoldenCookie();
 
-// Auto-clicker prestige unlock (1 click/sec)
+// Auto-clicker prestige unlock (1 click/sec, or 3/sec with v2)
+const autoClickInterval = hasPrestige('ot_auto_click_v2') ? 333 : 1000;
 setInterval(() => {
   if (hasPrestige('ot_auto_click')) {
     const gained = safeNum(perClick(), 1);
@@ -1958,7 +2036,7 @@ setInterval(() => {
     state.totalEarned = safeNum(state.totalEarned, 0) + gained;
     state.lifetimeEarned = safeNum(state.lifetimeEarned, 0) + gained;
   }
-}, 1000);
+}, autoClickInterval);
 
 // Cache FID for admin checks in synchronous render()
 try {
